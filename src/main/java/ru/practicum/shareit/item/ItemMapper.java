@@ -45,25 +45,9 @@ public class ItemMapper {
                 .build();
     }
 
-
-    /*private static ItemDtoShortResponse toItemDtoShortResponse(Item item) {
-        return ItemDtoShortResponse.builder()
-                .name(item.getName())
-                .description(item.getDescription())
-                .build();
-    }
-
-    public static List<ItemDtoShortResponse> toItemDtoShortResponseList(List<Item> allByUser) {
-        List<ItemDtoShortResponse> all = new ArrayList<>();
-        for (Item item : allByUser) {
-            all.add(toItemDtoShortResponse(item));
-        }
-        return all;
-    }*/
-
     public static List<ItemDtoResponse> toItemDtoResponseList(List<Item> items) {
         List<ItemDtoResponse> itemDtoResponseList = new ArrayList<>();
-        for(Item item : items) {
+        for (Item item : items) {
             itemDtoResponseList.add(toItemDtoResponse(item));
         }
         return itemDtoResponseList;

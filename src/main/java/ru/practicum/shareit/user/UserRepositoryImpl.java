@@ -27,7 +27,9 @@ public class UserRepositoryImpl implements UserRepository {
             log.warn("Электронная почта должна содержать символ @");
             throw new ValidationException("Электронная почта должна содержать символ @");
         }
-        List<User> usersByEmail = users.values().stream().filter(x -> x.getEmail().equals(user.getEmail())).collect(Collectors.toList());
+        List<User> usersByEmail = users.values().stream()
+                .filter(x -> x.getEmail().equals(user.getEmail()))
+                .collect(Collectors.toList());
         if (!usersByEmail.isEmpty()) {
             log.error("Пользователь с email = {} уже создан", user.getEmail());
             throw new UserAlreadyExistException("Пользователь с email = " + user.getEmail() + " уже создан");
@@ -51,10 +53,10 @@ public class UserRepositoryImpl implements UserRepository {
             throw new UserAlreadyExistException("Пользователь с email = " + user.getEmail() + " уже создан");
         }
         User oldUser = users.get(user.getId());
-        User newUser = User.builder().
-                id(user.getId()).
-                name(Optional.ofNullable(user.getName()).orElse(oldUser.getName())).
-                email(Optional.ofNullable(user.getEmail()).orElse(oldUser.getEmail())).build();
+        User newUser = User.builder()
+                .id(user.getId())
+                .name(Optional.ofNullable(user.getName()).orElse(oldUser.getName()))
+                .email(Optional.ofNullable(user.getEmail()).orElse(oldUser.getEmail())).build();
         users.put(user.getId(), newUser);
         return users.get(user.getId());
     }

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.common.ValidationException;
 import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -39,12 +38,12 @@ public class ItemRepositoryImpl implements ItemRepository {
             throw new ItemIncorrectOwnerException("Пользователь с id = " + user.getId() + " не является владельцем " +
                     "вещи с id = " + item.getId());
         }
-        Item newItem = Item.builder().
-                id(item.getId()).
-                name(Optional.ofNullable(item.getName()).orElse(oldItem.getName())).
-                description(Optional.ofNullable(item.getDescription()).orElse(oldItem.getDescription())).
-                available(Optional.ofNullable(item.getAvailable()).orElse(oldItem.getAvailable())).
-                owner(Optional.ofNullable(item.getOwner()).orElse(oldItem.getOwner())).build();
+        Item newItem = Item.builder()
+                .id(item.getId())
+                .name(Optional.ofNullable(item.getName()).orElse(oldItem.getName()))
+                .description(Optional.ofNullable(item.getDescription()).orElse(oldItem.getDescription()))
+                .available(Optional.ofNullable(item.getAvailable()).orElse(oldItem.getAvailable()))
+                .owner(Optional.ofNullable(item.getOwner()).orElse(oldItem.getOwner())).build();
         items.put(item.getId(), newItem);
         return items.get(item.getId());
     }
