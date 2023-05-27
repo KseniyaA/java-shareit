@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -17,6 +16,7 @@ import java.util.stream.Collectors;
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
     private HashMap<Long, Item> items = new HashMap<>();
+
     private AtomicLong idSequence = new AtomicLong(0);;
 
     @Override
