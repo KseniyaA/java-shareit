@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
@@ -24,6 +25,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item update(Item item, long userId) {
         User user = userRepository.getById(userId);
+        User currentOwner = get(item.getId()).getOwner();
+        if (!currentOwner.equals(user)) {
+            log.error("Пользователь с id = {} не является владельцем вещи с id = {}", user.getId(), item.getId());
+            throw new ItemIncorrectOwnerException("Пользователь с id = " + user.getId() + " не является владельцем " +
+                    "вещи с id = " + item.getId());
+        }
         return itemRepository.update(item, user);
     }
 

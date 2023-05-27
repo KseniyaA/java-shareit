@@ -14,17 +14,18 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping(path = "/items")
 public class ItemController {
     private final ItemService itemService;
 
-    @PostMapping("/items")
+    @PostMapping
     public ItemDtoResponse add(@RequestHeader("X-Sharer-User-Id") long userId,
                                @Valid @RequestBody ItemDtoCreateRequest itemDto) {
         Item createdItem = itemService.add(ItemMapper.toItemCreateRequest(itemDto), userId);
         return ItemMapper.toItemDtoResponse(createdItem);
     }
 
-    @PatchMapping("/items/{itemId}")
+    @PatchMapping("/{itemId}")
     public ItemDtoResponse update(@RequestHeader("X-Sharer-User-Id") long userId,
                        @PathVariable("itemId") long id,
                        @RequestBody ItemDtoUpdateRequest itemDtoUpdateRequest) {
@@ -32,18 +33,18 @@ public class ItemController {
         return ItemMapper.toItemDtoResponse(updatedItem);
     }
 
-    @GetMapping("/items/{itemId}")
+    @GetMapping("/{itemId}")
     public ItemDtoResponse get(@RequestHeader("X-Sharer-User-Id") long userId,
                                @PathVariable("itemId") long id) {
         return ItemMapper.toItemDtoResponse(itemService.get(id));
     }
 
-    @GetMapping("/items")
+    @GetMapping
     public List<ItemDtoResponse> getAllByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
         return ItemMapper.toItemDtoResponseList(itemService.getAllByUser(userId));
     }
 
-    @GetMapping("/items/search")
+    @GetMapping("/search")
     public List<ItemDtoResponse> search(@RequestHeader("X-Sharer-User-Id") long userId,
                                         @RequestParam String text) {
         List<Item> items = itemService.searchByText(text);

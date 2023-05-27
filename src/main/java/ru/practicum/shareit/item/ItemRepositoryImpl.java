@@ -10,17 +10,18 @@ import ru.practicum.shareit.user.model.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
     private HashMap<Long, Item> items = new HashMap<>();
-    private int idSequence = 0;
+    private AtomicLong idSequence = new AtomicLong(0);;
 
     @Override
     public Item add(Item item, User owner) {
-        item.setId(++idSequence);
+        item.setId(idSequence.addAndGet(1));
         item.setOwner(owner);
         items.put(item.getId(), item);
         return item;
@@ -30,13 +31,8 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Item update(Item item, User user) {
         Item oldItem = items.get(item.getId());
         if (!items.containsKey(item.getId())) {
-            log.error("Вещь с id = {} не найден", item.getId());
+            log.error("Вещь с id = {} не найдена", item.getId());
             throw new ItemNotFoundException("Вещь с id = " + item.getId() + " не найдена");
-        }
-        if (!oldItem.getOwner().equals(user)) {
-            log.error("Пользователь с id = {} не является владельцем вещи с id = {}", user.getId(), item.getId());
-            throw new ItemIncorrectOwnerException("Пользователь с id = " + user.getId() + " не является владельцем " +
-                    "вещи с id = " + item.getId());
         }
         Item newItem = Item.builder()
                 .id(item.getId())

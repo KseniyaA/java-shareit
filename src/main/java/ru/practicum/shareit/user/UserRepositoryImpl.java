@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class UserRepositoryImpl implements UserRepository {
     private HashMap<Long, User> users = new HashMap<>();
-    private int idSequence = 0;
+    private AtomicLong idSequence = new AtomicLong(0);
 
     @Override
     public User create(User user) {
@@ -34,7 +35,7 @@ public class UserRepositoryImpl implements UserRepository {
             log.error("Пользователь с email = {} уже создан", user.getEmail());
             throw new UserAlreadyExistException("Пользователь с email = " + user.getEmail() + " уже создан");
         }
-        user.setId(++idSequence);
+        user.setId(idSequence.addAndGet(1));
         users.put(user.getId(), user);
         return user;
     }
