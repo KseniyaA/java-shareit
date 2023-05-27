@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
     private HashMap<Long, Item> items = new HashMap<>();
-
-    private AtomicLong idSequence = new AtomicLong(0);;
+    private AtomicLong idSequence = new AtomicLong(0);
 
     @Override
     public Item add(Item item, User owner) {
