@@ -1,12 +1,23 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+import javax.persistence.*;
+
+@Entity
+@Table(name = "users"/*, schema = "public"*/)
 @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String name;
 }

@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserDtoCreateRequest;
-import ru.practicum.shareit.user.dto.UserDtoUpdateRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -22,13 +20,13 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody UserDtoCreateRequest userDto) {
+    public User create(@RequestBody UserDto userDto) {
         log.info("Получен запрос POST /users с параметрами {}", userDto);
-        return userService.create(UserMapper.convertUserDtoCreateRequestToUser(userDto));
+        return userService.create(UserMapper.convertUserDtoToUser(userDto));
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@RequestBody UserDtoUpdateRequest userDtoUpdateRequest,
+    public UserDto update(@RequestBody UserDto userDtoUpdateRequest,
                           @PathVariable("userId") long userId) {
         log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoUpdateRequest, userId);
         User user = userService.update(UserMapper.toUser(userDtoUpdateRequest, userId));

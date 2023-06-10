@@ -1,8 +1,6 @@
 package ru.practicum.shareit.user;
 
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserDtoCreateRequest;
-import ru.practicum.shareit.user.dto.UserDtoUpdateRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -11,12 +9,14 @@ import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    public static User convertUserDtoCreateRequestToUser(UserDtoCreateRequest userDto) {
+    public static User convertUserDtoToUser(UserDto userDto) {
         return User.builder()
+                .id(userDto.getId())
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
     }
+
 
     public static UserDto toUserDto(User user) {
         return UserDto.builder()
@@ -30,15 +30,14 @@ public class UserMapper {
         return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
-    public static User toUser(UserDtoUpdateRequest userDto, long userId) {
-        User.UserBuilder userBuilder = User.builder()
-                .id(userId);
+    public static User toUser(UserDto userDto, long userId) {
+        User.UserBuilder builder = User.builder().id(userId);
         if (Optional.ofNullable(userDto.getEmail()).isPresent()) {
-            userBuilder.email(userDto.getEmail());
+            builder.email(userDto.getEmail());
         }
         if (Optional.ofNullable(userDto.getName()).isPresent()) {
-            userBuilder.name(userDto.getName());
+            builder.name(userDto.getName());
         }
-        return userBuilder.build();
+        return builder.build();
     }
 }

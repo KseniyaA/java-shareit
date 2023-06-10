@@ -4,13 +4,20 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
+import javax.persistence.*;
 
+@Entity
+@Table(name = "requests")
 @Data
 @Builder
-public class ItemRequest {
+public class Request {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User requester;
-    private LocalDateTime created;
 }

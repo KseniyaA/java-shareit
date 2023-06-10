@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ItemDtoUpdateRequest {
+public class ItemDtoRequest {
     private String name;
     private String description;
     private Boolean available;
