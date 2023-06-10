@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class CommentMapper {
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    
     public static Comment toComment(CommentDto commentDto) {
         return Comment.builder()
                 .text(commentDto.getText())

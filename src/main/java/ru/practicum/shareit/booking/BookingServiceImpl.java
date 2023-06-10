@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.exception.BookingIncorrectDatаException;
+import ru.practicum.shareit.booking.exception.BookingIncorrectDataException;
 import ru.practicum.shareit.booking.exception.BookingNotFoundException;
 import ru.practicum.shareit.booking.exception.BookingUnavailableOperationException;
 import ru.practicum.shareit.booking.exception.UnsupportedStatusException;
@@ -31,19 +31,19 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime start = booking.getStart();
         LocalDateTime end = booking.getEnd();
         if (start == null || end == null) {
-            throw new BookingIncorrectDatаException("Дата начала и окончания бронирования должны быть заданы");
+            throw new BookingIncorrectDataException("Дата начала и окончания бронирования должны быть заданы");
         }
         if (start.isBefore(LocalDateTime.now())) {
-            throw new BookingIncorrectDatаException("Дата начала бронирования не может быть раньше текущего дня");
+            throw new BookingIncorrectDataException("Дата начала бронирования не может быть раньше текущего дня");
         }
         if (end.isBefore(LocalDateTime.now())) {
-            throw new BookingIncorrectDatаException("Дата окончания бронирования не может быть в прошлом");
+            throw new BookingIncorrectDataException("Дата окончания бронирования не может быть в прошлом");
         }
         if (start.isAfter(end)) {
-            throw new BookingIncorrectDatаException("Дата окончания бронирования не может быть раньше даты начала");
+            throw new BookingIncorrectDataException("Дата окончания бронирования не может быть раньше даты начала");
         }
         if (start.equals(end)) {
-            throw new BookingIncorrectDatаException("Дата начала и окончания бронирования не могут совпадать");
+            throw new BookingIncorrectDataException("Дата начала и окончания бронирования не могут совпадать");
         }
 
     }
@@ -59,7 +59,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ItemNotFoundException("Владелец вещи не может забронировать вещь");
         }
         if (!itemOptional.get().getAvailable()) {
-            throw new BookingIncorrectDatаException("Вещь с id = " + booking.getItem().getId() + " не доступна для бронирования");
+            throw new BookingIncorrectDataException("Вещь с id = " + booking.getItem().getId() + " не доступна для бронирования");
         }
         checkBookingDates(booking);
         booking.setStatus(BookingStatus.WAITING);
@@ -93,7 +93,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking approve(long bookingId, Boolean approved, long userId) {
         if (approved == null) {
-            throw new BookingIncorrectDatаException("Не передано значение параметра approve");
+            throw new BookingIncorrectDataException("Не передано значение параметра approve");
         }
         Booking booking = getById(bookingId);
         if (booking.getItem().getOwner().getId() != userId) {
@@ -101,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
                     "только владельцем вещи");
         }
         if (booking.getStatus().equals(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED)) {
-            throw new BookingIncorrectDatаException("Статус уже изменен");
+            throw new BookingIncorrectDataException("Статус уже изменен");
         }
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         return booking;
@@ -138,8 +138,8 @@ public class BookingServiceImpl implements BookingService {
             case "CURRENT":
                 BooleanExpression byEndBefore = QBooking.booking.end.after(LocalDateTime.now());
                 BooleanExpression byStartAfter = QBooking.booking.start.before(LocalDateTime.now());
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndBefore).and(byStartAfter)
-                        , sortByStartDateAsc);
+                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndBefore).and(byStartAfter),
+                        sortByStartDateAsc);
             case "PAST":
                 BooleanExpression byEndAfter = QBooking.booking.end.before(LocalDateTime.now());
                 return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndAfter), sortByStartDateDesc);

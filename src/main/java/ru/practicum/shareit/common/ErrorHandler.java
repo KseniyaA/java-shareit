@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.booking.exception.BookingNotFoundException;
-import ru.practicum.shareit.booking.exception.BookingIncorrectDatаException;
+import ru.practicum.shareit.booking.exception.BookingIncorrectDataException;
 import ru.practicum.shareit.booking.exception.BookingUnavailableOperationException;
 import ru.practicum.shareit.booking.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
@@ -58,7 +58,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBookingIncorrectDateException(final BookingIncorrectDatаException e) {
+    public ErrorResponse handleBookingIncorrectDateException(final BookingIncorrectDataException e) {
         return new ErrorResponse(
                 "Ошибка данных запроса", e.getMessage()
         );

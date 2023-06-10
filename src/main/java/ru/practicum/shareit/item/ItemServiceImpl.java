@@ -66,10 +66,9 @@ public class ItemServiceImpl implements ItemService {
         Item oldItem = get(item.getId());
         User currentOwner = oldItem.getOwner();
         if (!currentOwner.equals(userOptional.get())) {
-            log.error("Пользователь с id = %s не является владельцем вещи с id = %s",
+            String error = String.format("Пользователь с id = %s не является владельцем вещи с id = %s",
                     userOptional.get().getId(), item.getId());
-            throw new ItemIncorrectOwnerException("Пользователь с id = " + userOptional.get().getId()
-                    + " не является владельцем " + "вещи с id = " + item.getId());
+            throw new ItemIncorrectOwnerException(error);
         }
 
         Item newItem = Item.builder()
@@ -116,20 +115,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Booking getLastBookingByItem(List<Booking> bookings) {
-        // TODO переписать на QueryDSL
-        /*BooleanExpression startBefore = QBooking.booking.start.before(LocalDateTime.now());
-        BooleanExpression eqStatusApproved = QBooking.booking.status.eq(BookingStatus.APPROVED);
-        Sort sortByStartDateDesc = Sort.by("start").descending();*/
         List<Booking> filteredBookings = bookings.stream()
                 .filter(x -> x.getStart().isBefore(LocalDateTime.now()))
                 .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
                 .sorted(Comparator.comparing(Booking::getStart).reversed())
                 .collect(Collectors.toList());
-        //Iterable<Booking> filteredBookings = bookingRepository.findAll(startBefore.and(eqStatusApproved), sortByStartDateDesc);
-        //return filteredBookings.iterator().hasNext() ? filteredBookings.iterator().next() : null;
-        /*if (filteredBookings.iterator().hasNext()) {
-            return filteredBookings.iterator().next();
-        }*/
         return filteredBookings.isEmpty() ? null : filteredBookings.get(0);
     }
 
@@ -140,11 +130,6 @@ public class ItemServiceImpl implements ItemService {
                 .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
                 .sorted(Comparator.comparing(Booking::getStart))
                 .collect(Collectors.toList());
-        /*BooleanExpression startAfter = QBooking.booking.start.after(LocalDateTime.now());
-        BooleanExpression eqStatusApproved = QBooking.booking.status.eq(BookingStatus.APPROVED);
-        Sort sortByStartDateAsc = Sort.by("start").ascending();
-        Iterable<Booking> filteredBookings = bookingRepository.findAll(startAfter.and(eqStatusApproved), sortByStartDateAsc);
-        return filteredBookings.iterator().hasNext() ? filteredBookings.iterator().next() : null;*/
         return filteredBookings.isEmpty() ? null : filteredBookings.get(0);
     }
 

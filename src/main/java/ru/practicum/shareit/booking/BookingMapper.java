@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BookingMapper {
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
     public static Booking toBookingCreateRequest(BookingDtoRequest bookingDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
