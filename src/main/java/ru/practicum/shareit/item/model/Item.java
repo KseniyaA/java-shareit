@@ -9,10 +9,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "items"/*, schema = "public"*/)
 @Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Getter @Setter
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +26,7 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
+    @ToString.Exclude
     private User owner;
 
     @Column(name = "is_available")
@@ -33,5 +34,6 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
+    @ToString.Exclude
     private Request request;
 }

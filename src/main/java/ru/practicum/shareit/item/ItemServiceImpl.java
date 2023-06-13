@@ -73,10 +73,11 @@ public class ItemServiceImpl implements ItemService {
 
         Item newItem = Item.builder()
                 .id(item.getId())
-                .name(Optional.ofNullable(item.getName()).orElse(oldItem.getName()))
-                .description(Optional.ofNullable(item.getDescription()).orElse(oldItem.getDescription()))
-                .available(Optional.ofNullable(item.getAvailable()).orElse(oldItem.getAvailable()))
-                .owner(Optional.ofNullable(item.getOwner()).orElse(oldItem.getOwner()))
+                .name(item.getName() == null || item.getName().isBlank() ? oldItem.getName() : item.getName())
+                .description(item.getDescription() == null || item.getDescription().isBlank() ?
+                        oldItem.getDescription() : item.getDescription())
+                .available(item.getAvailable() == null ? oldItem.getAvailable() : item.getAvailable())
+                .owner(item.getOwner() == null ? oldItem.getOwner() : item.getOwner())
                 .build();
 
         return itemRepository.save(newItem);

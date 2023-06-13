@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "bookings"/*, schema = "public"*/)
 @Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter @Setter
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

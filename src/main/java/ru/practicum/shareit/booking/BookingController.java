@@ -26,7 +26,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoResponse add(@RequestHeader("X-Sharer-User-Id") long userId,
-                                  @Valid @RequestBody BookingDtoRequest bookingDto) {
+                                  @RequestBody BookingDtoRequest bookingDto) {
         User booker = userService.getById(userId);
         Booking createdBooking = bookingService.create(BookingMapper.toBookingCreateRequest(bookingDto), booker);
         return BookingMapper.toBookingDtoResponse(createdBooking);

@@ -26,27 +26,16 @@ public class UserServiceImpl implements UserService {
             log.warn("Электронная почта должна содержать символ @");
             throw new ValidationException("Электронная почта должна содержать символ @");
         }
-        /*List<User> usersByEmail = userRepository.findByEmail(user.getEmail());
-        if (!usersByEmail.isEmpty()) {
-            log.error("Пользователь с email = {} уже создан", user.getEmail());
-            throw new UserAlreadyExistException("Пользователь с email = " + user.getEmail() + " уже создан");
-        }*/
         return userRepository.save(user);
     }
 
     @Override
     public User update(User user) {
-        /*List<User> usersByEmail = userRepository.findByEmail(user.getEmail());
-        if (!usersByEmail.isEmpty()) {
-            log.error("Пользователь с email = {} уже создан", user.getEmail());
-            throw new UserAlreadyExistException("Пользователь с email = " + user.getEmail() + " уже создан");
-        }*/
         User oldUser = getById(user.getId());
         User newUser = new User();
         newUser.setId(user.getId());
-        newUser.setName(Optional.ofNullable(user.getName()).orElse(oldUser.getName()));
-        newUser.setEmail(Optional.ofNullable(user.getEmail()).orElse(oldUser.getEmail()));
-
+        newUser.setName(user.getName() == null || user.getName().isBlank() ? oldUser.getName() : user.getName());
+        newUser.setEmail(user.getEmail() == null || user.getEmail().isBlank() ? oldUser.getEmail() : user.getEmail());
         return userRepository.save(newUser);
     }
 

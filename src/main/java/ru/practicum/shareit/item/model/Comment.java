@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "comments")
 @Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Getter @Setter
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,12 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
+    @ToString.Exclude
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
+    @ToString.Exclude
     private User author;
 
     @Column
