@@ -12,7 +12,8 @@ import javax.persistence.*;
 @Table(name = "requests")
 @Builder
 @ToString
-@Getter @Setter
+@Getter
+@Setter
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
