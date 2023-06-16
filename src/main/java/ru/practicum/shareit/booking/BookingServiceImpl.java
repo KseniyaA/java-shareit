@@ -15,9 +15,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.QItem;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
-import static ru.practicum.shareit.common.Constants.CURRENT_DATE_TIME;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +102,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private List<Booking> getBookingsByParams(String state, BooleanExpression byOwnerOrBookerId) {
+        LocalDateTime now = LocalDateTime.now();
         Sort sortByStartDateDesc = Sort.by(START_FIELD).descending();
         Sort sortByStartDateAsc = Sort.by(START_FIELD).ascending();
         BookingFilterState filterState = BookingFilterState.findByValue(state);
@@ -113,15 +113,15 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId, sortByStartDateDesc);
             case CURRENT:
-                BooleanExpression byEndBefore = QBooking.booking.end.after(CURRENT_DATE_TIME);
-                BooleanExpression byStartAfter = QBooking.booking.start.before(CURRENT_DATE_TIME);
+                BooleanExpression byEndBefore = QBooking.booking.end.after(now);
+                BooleanExpression byStartAfter = QBooking.booking.start.before(now);
                 return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndBefore).and(byStartAfter),
                         sortByStartDateAsc);
             case PAST:
-                BooleanExpression byEndAfter = QBooking.booking.end.before(CURRENT_DATE_TIME);
+                BooleanExpression byEndAfter = QBooking.booking.end.before(now);
                 return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndAfter), sortByStartDateDesc);
             case FUTURE:
-                byStartAfter = QBooking.booking.start.after(CURRENT_DATE_TIME);
+                byStartAfter = QBooking.booking.start.after(now);
                 return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byStartAfter), sortByStartDateDesc);
             case WAITING:
                 BooleanExpression eqWaitingStatus = QBooking.booking.status.eq(BookingStatus.WAITING);

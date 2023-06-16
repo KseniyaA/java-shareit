@@ -11,7 +11,6 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.QBooking;
-import ru.practicum.shareit.common.Constants;
 import ru.practicum.shareit.common.EntityNotFoundException;
 import ru.practicum.shareit.common.ValidationException;
 import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
@@ -20,6 +19,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -122,7 +122,7 @@ public class ItemServiceImpl implements ItemService {
             return null;
         }
         List<Booking> filteredBookings = bookings.stream()
-                .filter(x -> x.getStart().isBefore(Constants.CURRENT_DATE_TIME))
+                .filter(x -> x.getStart().isBefore(LocalDateTime.now()))
                 .sorted(Comparator.comparing(Booking::getStart).reversed())
                 .collect(toList());
         return filteredBookings.isEmpty() ? null : filteredBookings.get(0);
@@ -133,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
             return null;
         }
         List<Booking> filteredBookings = bookings.stream()
-                .filter(x -> x.getStart().isAfter(Constants.CURRENT_DATE_TIME))
+                .filter(x -> x.getStart().isAfter(LocalDateTime.now()))
                 .sorted(Comparator.comparing(Booking::getStart))
                 .collect(toList());
         return filteredBookings.isEmpty() ? null : filteredBookings.get(0);
@@ -141,12 +141,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment createComment(Comment comment, long userId, long itemId) {
+        final LocalDateTime now = LocalDateTime.now();
         if (!StringUtils.hasLength(comment.getText())) {
             throw new ValidationException("Не задан текст комментария");
         }
         BooleanExpression eqUserId = QBooking.booking.booker.id.eq(userId);
         BooleanExpression eqItemId = QBooking.booking.item.id.eq(itemId);
-        BooleanExpression endBeforeNow = QBooking.booking.end.before(Constants.CURRENT_DATE_TIME);
+        BooleanExpression endBeforeNow = QBooking.booking.end.before(now);
         Iterable<Booking> filteredBookings = bookingRepository.findAll(eqUserId.and(eqItemId).and(endBeforeNow));
         if (!filteredBookings.iterator().hasNext()) {
             String error = String.format("Пользователь с id = %s не брал в аренду вещь с id = %s", userId, itemId);
@@ -154,9 +155,7 @@ public class ItemServiceImpl implements ItemService {
         }
         comment.setAuthor(userRepository.getReferenceById(userId));
         comment.setItem(get(itemId, userId));
-        // не придумала как тут исправить, если setCreated(LocalDateTime.now()) то валятся тесты, какие-то проблемы со
-        // сравнением дат
-        comment.setCreated(Constants.CURRENT_DATE_TIME.plusMinutes(1));
+        comment.setCreated(now);
         return commentRepository.save(comment);
     }
 }
