@@ -16,5 +16,5 @@ public class ItemDtoResponse {
     private UserDtoRequest owner;
     private Boolean available;
     private RequestDto request;
-    private List<CommentDtoRequest> comments;
+    private List<CommentDtoResponse> comments;
 }

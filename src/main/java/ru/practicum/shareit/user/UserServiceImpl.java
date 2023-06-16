@@ -15,13 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
+    private static final EmailValidator VALIDATOR = EmailValidator.getInstance();
     private final UserRepository userRepository;
 
     @Transactional
     @Override
     public User create(User user) {
-        EmailValidator validator = EmailValidator.getInstance();
-        if (!validator.isValid(user.getEmail())) {
+        if (!VALIDATOR.isValid(user.getEmail())) {
             log.warn("Электронная почта должна содержать символ @");
             throw new ValidationException("Электронная почта должна содержать символ @");
         }

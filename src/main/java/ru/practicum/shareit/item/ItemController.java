@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,14 +16,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path = "/items")
-@Validated
 public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    @Validated({Marker.OnCreate.class})
     public ItemDtoResponse add(@RequestHeader("X-Sharer-User-Id") long userId,
-                               @Valid @RequestBody ItemDtoRequest itemDto) {
+                               @Validated(Marker.OnCreate.class) @RequestBody ItemDtoRequest itemDto) {
         Item createdItem = itemService.add(ItemMapper.toItemRequest(itemDto), userId);
         return ItemMapper.toItemDtoResponse(createdItem);
     }
@@ -32,14 +29,14 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDtoResponse update(@RequestHeader("X-Sharer-User-Id") long userId,
                        @PathVariable("itemId") Long id,
-                       @RequestBody ItemDtoRequest itemDtoRequest) {
+                       @Validated(Marker.OnUpdate.class) @RequestBody ItemDtoRequest itemDtoRequest) {
         Item updatedItem =  itemService.update(ItemMapper.toItemRequest(itemDtoRequest, id), userId);
         return ItemMapper.toItemDtoResponse(updatedItem);
     }
 
     @GetMapping("/{itemId}")
     public ItemDtoWithBookingDateResponse get(@RequestHeader("X-Sharer-User-Id") long userId,
-                               @PathVariable("itemId") long id) {
+                                              @PathVariable("itemId") long id) {
         Item item = itemService.get(id, userId);
         return ItemMapper.toItemDtoWithBookingDateResponse(item);
     }
@@ -57,11 +54,10 @@ public class ItemController {
         return ItemMapper.toItemDtoResponseList(items);
     }
 
-    @Validated({Marker.OnCreate.class})
     @PostMapping("/{itemId}/comment")
     public CommentDtoResponse createComment(@RequestHeader("X-Sharer-User-Id") long userId,
                                             @PathVariable("itemId") long itemId,
-                                            @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
+                                            @Validated({Marker.OnCreate.class}) @RequestBody CommentDtoRequest commentDtoRequest) {
         Comment newComment = itemService.createComment(CommentMapper.toComment(commentDtoRequest), userId, itemId);
         return CommentMapper.toCommentDtoResponse(newComment);
     }

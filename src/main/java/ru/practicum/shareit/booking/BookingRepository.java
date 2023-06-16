@@ -9,7 +9,7 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long>, QuerydslPredicateExecutor<Booking> {
     List<Booking> findByItem_Id(long itemId);
 
-    List<Booking> findByItemInAndStatus(List<Item> items, BookingStatus status);
+    List<Booking> findByItemInAndStatusOrderByStartAsc(List<Item> items, BookingStatus status);
 
-    List<Booking> findByItemAndStatus(Item item, BookingStatus status);
+    List<Booking> findByItemAndStatusOrderByStartAsc(Item item, BookingStatus status);
 }

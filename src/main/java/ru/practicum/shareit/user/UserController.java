@@ -9,27 +9,24 @@ import ru.practicum.shareit.user.dto.UserDtoRequest;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@Validated
 public class UserController {
     private final UserService userService;
 
     @PostMapping
-    @Validated({Marker.OnCreate.class})
-    public UserDtoResponse create(@RequestBody @Valid UserDtoRequest userDtoRequest) {
+    public UserDtoResponse create(@RequestBody @Validated({Marker.OnCreate.class}) UserDtoRequest userDtoRequest) {
         log.info("Получен запрос POST /users с параметрами {}", userDtoRequest);
         User user = userService.create(UserMapper.toUser(userDtoRequest));
         return UserMapper.toUserDtoResponse(user);
     }
 
     @PatchMapping("/{userId}")
-    public UserDtoResponse update(@RequestBody UserDtoRequest userDtoRequest,
+    public UserDtoResponse update(@Validated({Marker.OnUpdate.class}) @RequestBody UserDtoRequest userDtoRequest,
                                  @PathVariable("userId") long userId) {
         log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoRequest, userId);
         User user = userService.update(UserMapper.toUser(userDtoRequest, userId));
