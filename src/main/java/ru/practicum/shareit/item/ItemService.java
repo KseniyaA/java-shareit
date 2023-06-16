@@ -11,7 +11,7 @@ public interface ItemService {
 
     Item update(Item item, long userId);
 
-    Item get(long id);
+    Item get(long id, long userId);
 
     List<Item> getAllByUser(Long userId);
 

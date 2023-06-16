@@ -54,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             throw new EntityNotFoundException("Пользователь с id = " + userId + " не существует");
         });
-        Item oldItem = get(item.getId());
+        Item oldItem = get(item.getId(), userId);
         User currentOwner = oldItem.getOwner();
         if (!currentOwner.equals(user)) {
             String error = String.format("Пользователь с id = %s не является владельцем вещи с id = %s",
@@ -75,14 +75,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item get(long id) {
+    public Item get(long id, long userId) {
         Item item = itemRepository.findById(id).orElseThrow(() -> {
                     throw new EntityNotFoundException("Вещь с id = " + id + " не найдена");
         });
         item.setComments(commentRepository.findByItem(item, Sort.by(DESC, "created")));
         List<Booking> bookings = bookingRepository.findByItemAndStatus(item, BookingStatus.APPROVED);
-        item.setNextBooking(getNextBookingByItem(bookings));
-        item.setLastBooking(getLastBookingByItem(bookings));
+        item.setNextBooking(item.getOwner().getId() == userId ? getNextBookingByItem(bookings) : null);
+        item.setLastBooking(item.getOwner().getId() == userId ? getLastBookingByItem(bookings) : null);
         return item;
     }
 
@@ -153,7 +153,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException(error);
         }
         comment.setAuthor(userRepository.getReferenceById(userId));
-        comment.setItem(get(itemId));
+        comment.setItem(get(itemId, userId));
         // не придумала как тут исправить, если setCreated(LocalDateTime.now()) то валятся тесты, какие-то проблемы со
         // сравнением дат
         comment.setCreated(Constants.CURRENT_DATE_TIME.plusMinutes(1));

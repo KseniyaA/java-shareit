@@ -43,7 +43,7 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDtoWithBookingDateResponse get(@RequestHeader("X-Sharer-User-Id") long userId,
                                @PathVariable("itemId") long id) {
-        Item item = itemService.get(id);
+        Item item = itemService.get(id, userId);
         return ItemMapper.toItemDtoWithBookingDateResponse(item);
     }
 
