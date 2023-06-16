@@ -19,7 +19,6 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

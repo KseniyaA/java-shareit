@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "items"/*, schema = "public"*/)
@@ -19,10 +21,8 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
     private String name;
 
-    @Column
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,4 +37,14 @@ public class Item {
     @JoinColumn(name = "request_id")
     @ToString.Exclude
     private Request request;
+
+    @Transient
+    private Booking lastBooking;
+
+    @Transient
+    private Booking nextBooking;
+
+    @Transient
+    private List<Comment> comments;
+
 }

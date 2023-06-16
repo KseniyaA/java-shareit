@@ -19,11 +19,5 @@ public interface ItemService {
 
     List<Booking> getBookingByItem(Item item);
 
-    Booking getLastBookingByItem(List<Booking> items);
-
-    Booking getNextBookingByItem(List<Booking> items);
-
     Comment createComment(Comment toComment, long userId, long itemId);
-
-    List<Comment> getComments(long itemId);
 }

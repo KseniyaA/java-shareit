@@ -10,4 +10,8 @@ public class ShareItApp {
 		SpringApplication.run(ShareItApp.class, args);
 	}
 
+/*	@PostConstruct
+	public void init(){
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+	}*/
 }

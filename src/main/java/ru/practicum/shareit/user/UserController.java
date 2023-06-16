@@ -1,26 +1,27 @@
 package ru.practicum.shareit.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.common.Marker;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping(path = "/users")
+@RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
     @PostMapping
-    public User create(@RequestBody UserDto userDto) {
+    @Validated({Marker.OnCreate.class})
+    public User create(@RequestBody @Valid UserDto userDto) {
         log.info("Получен запрос POST /users с параметрами {}", userDto);
         return userService.create(UserMapper.convertUserDtoToUser(userDto));
     }

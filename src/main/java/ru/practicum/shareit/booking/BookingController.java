@@ -1,31 +1,31 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.common.Marker;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
+@RequiredArgsConstructor
+@Validated
 public class BookingController {
     private final BookingService bookingService;
     private final UserService userService;
 
-    @Autowired
-    public BookingController(BookingService bookingService, UserService userService) {
-        this.bookingService = bookingService;
-        this.userService = userService;
-    }
-
     @PostMapping
+    @Validated({Marker.OnCreate.class})
     public BookingDtoResponse add(@RequestHeader("X-Sharer-User-Id") long userId,
-                                  @RequestBody BookingDtoRequest bookingDto) {
+                                  @RequestBody @Valid BookingDtoRequest bookingDto) {
         User booker = userService.getById(userId);
         Booking createdBooking = bookingService.create(BookingMapper.toBookingCreateRequest(bookingDto), booker);
         return BookingMapper.toBookingDtoResponse(createdBooking);
@@ -38,7 +38,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDtoResponse approve(@RequestHeader("X-Sharer-User-Id") long userId,
                                   @PathVariable("bookingId") long bookingId,
-                                  @RequestParam(defaultValue = "") Boolean approved) {
+                                  @RequestParam Boolean approved) {
         return BookingMapper.toBookingDtoResponse(bookingService.approve(bookingId, approved, userId));
     }
 

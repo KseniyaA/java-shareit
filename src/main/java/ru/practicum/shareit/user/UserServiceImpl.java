@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.common.EntityNotFoundException;
 import ru.practicum.shareit.common.ValidationException;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,11 +45,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isEmpty()) {
-                throw new UserNotFoundException("Пользователь с id = " + id + " не найден");
-        }
-        return userOptional.get();
+        return userRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException("Пользователь с id = " + id + " не найден");
+                });
     }
 
     @Override
