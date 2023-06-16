@@ -38,19 +38,12 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    /*private void checkItem(Item item) {
-        if (!StringUtils.hasLength(item.getName()) || !StringUtils.hasLength(item.getDescription())
-                || item.getAvailable() == null) {
-            throw new ValidationException("Некорректное значение входных параметров");
-        }
-    }*/
-
     @Transactional
     @Override
     public Item add(Item item, long ownerId) {
-        //checkItem(item);
-        User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> {throw new EntityNotFoundException("Пользователь с id = " + ownerId + " не существует");});
+        User owner = userRepository.findById(ownerId).orElseThrow(() -> {
+                    throw new EntityNotFoundException("Пользователь с id = " + ownerId + " не существует");
+        });
         item.setOwner(owner);
         return itemRepository.save(item);
     }
@@ -58,8 +51,9 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public Item update(Item item, long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> {throw new EntityNotFoundException("Пользователь с id = " + userId + " не существует");});
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            throw new EntityNotFoundException("Пользователь с id = " + userId + " не существует");
+        });
         Item oldItem = get(item.getId());
         User currentOwner = oldItem.getOwner();
         if (!currentOwner.equals(user)) {

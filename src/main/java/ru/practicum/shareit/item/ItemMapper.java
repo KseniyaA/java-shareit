@@ -76,7 +76,7 @@ public class ItemMapper {
                         .start(item.getLastBooking().getStart())
                         .end(item.getLastBooking().getEnd())
                         .build())
-                .comments(item.getComments()== null ? null :
+                .comments(item.getComments() == null ? null :
                     item.getComments().stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()))
                 .build();
     }

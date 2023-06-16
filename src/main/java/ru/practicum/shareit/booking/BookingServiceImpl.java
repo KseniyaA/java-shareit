@@ -30,8 +30,9 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public Booking create(Booking booking, User booker) {
-        Item item = itemRepository.findById(booking.getItem().getId())
-                .orElseThrow(() -> {throw new EntityNotFoundException("Вещь с id = " + booking.getItem().getId() + " не найдена");});
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() -> {
+            throw new EntityNotFoundException("Вещь с id = " + booking.getItem().getId() + " не найдена");
+        });
         if (booker.getId().equals(item.getOwner().getId())) {
             throw new EntityNotFoundException("Владелец вещи не может забронировать вещь");
         }
