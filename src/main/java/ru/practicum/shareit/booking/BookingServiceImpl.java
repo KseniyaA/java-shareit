@@ -109,7 +109,6 @@ public class BookingServiceImpl implements BookingService {
         if (filterState == null) {
             throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
-        
         switch (filterState) {
             case ALL:
                 return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId, sortByStartDateDesc);
