@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
-public class UserDto {
+public class UserDtoRequest {
     private Long id;
 
     @NotBlank(groups = Marker.OnCreate.class,

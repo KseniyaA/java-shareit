@@ -9,14 +9,14 @@ public class RequestMapper {
     public RequestDto toRequestDto(Request request) {
         return RequestDto.builder()
                 .description(request.getDescription())
-                .requester(UserMapper.toUserDto(request.getRequester()))
+                .requester(UserMapper.toUserDtoRequest(request.getRequester()))
                 .build();
     }
 
     public Request toRequest(RequestDto requestDto) {
         return Request.builder()
                 .description(requestDto.getDescription())
-                .requester(UserMapper.convertUserDtoToUser(requestDto.getRequester()))
+                .requester(UserMapper.toUser(requestDto.getRequester()))
                 .id(requestDto.getId())
                 .build();
     }

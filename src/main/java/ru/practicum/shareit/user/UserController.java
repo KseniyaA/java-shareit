@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.common.Marker;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoRequest;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.Valid;
@@ -21,17 +22,18 @@ public class UserController {
 
     @PostMapping
     @Validated({Marker.OnCreate.class})
-    public User create(@RequestBody @Valid UserDto userDto) {
-        log.info("Получен запрос POST /users с параметрами {}", userDto);
-        return userService.create(UserMapper.convertUserDtoToUser(userDto));
+    public UserDtoResponse create(@RequestBody @Valid UserDtoRequest userDtoRequest) {
+        log.info("Получен запрос POST /users с параметрами {}", userDtoRequest);
+        User user = userService.create(UserMapper.toUser(userDtoRequest));
+        return UserMapper.toUserDtoResponse(user);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@RequestBody UserDto userDtoUpdateRequest,
-                          @PathVariable("userId") long userId) {
-        log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoUpdateRequest, userId);
-        User user = userService.update(UserMapper.toUser(userDtoUpdateRequest, userId));
-        return UserMapper.toUserDto(user);
+    public UserDtoResponse update(@RequestBody UserDtoRequest userDtoRequest,
+                                 @PathVariable("userId") long userId) {
+        log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoRequest, userId);
+        User user = userService.update(UserMapper.toUser(userDtoRequest, userId));
+        return UserMapper.toUserDtoResponse(user);
     }
 
     @DeleteMapping("/{userId}")
@@ -41,14 +43,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto get(@PathVariable long id) {
+    public UserDtoResponse get(@PathVariable long id) {
         log.info("Получен запрос GET /users/{id} с параметрами id = {}", id);
-        return UserMapper.toUserDto(userService.getById(id));
+        return UserMapper.toUserDtoResponse(userService.getById(id));
     }
 
     @GetMapping
-    public List<UserDto> getAll() {
+    public List<UserDtoResponse> getAll() {
         log.info("Получен запрос GET /users");
-        return UserMapper.toUserDtoList(userService.getAll());
+        return UserMapper.toUserDtoResponseList(userService.getAll());
     }
 }

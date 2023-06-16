@@ -3,7 +3,7 @@ package ru.practicum.shareit.request.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.common.Marker;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoRequest;
 
 import javax.validation.constraints.NotBlank;
 
@@ -18,5 +18,5 @@ public class RequestDto {
 
     @NotBlank(groups = Marker.OnCreate.class,
             message = "Поле requester не должно быть пустым")
-    private UserDto requester;
+    private UserDtoRequest requester;
 }

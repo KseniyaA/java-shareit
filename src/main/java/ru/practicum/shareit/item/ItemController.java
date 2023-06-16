@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.common.Marker;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDtoRequest;
-import ru.practicum.shareit.item.dto.ItemDtoResponse;
-import ru.practicum.shareit.item.dto.ItemDtoWithBookingDateResponse;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
@@ -62,10 +59,10 @@ public class ItemController {
 
     @Validated({Marker.OnCreate.class})
     @PostMapping("/{itemId}/comment")
-    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") long userId,
-                               @PathVariable("itemId") long itemId,
-                               @Valid @RequestBody CommentDto commentDto) {
-        Comment newComment = itemService.createComment(CommentMapper.toComment(commentDto), userId, itemId);
-        return CommentMapper.toCommentDto(newComment);
+    public CommentDtoResponse createComment(@RequestHeader("X-Sharer-User-Id") long userId,
+                                            @PathVariable("itemId") long itemId,
+                                            @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
+        Comment newComment = itemService.createComment(CommentMapper.toComment(commentDtoRequest), userId, itemId);
+        return CommentMapper.toCommentDtoResponse(newComment);
     }
 }

@@ -42,7 +42,7 @@ public class ItemMapper {
         return ItemDtoResponse.builder()
                 .name(item.getName())
                 .description(item.getDescription())
-                .owner(UserMapper.toUserDto(item.getOwner()))
+                .owner(UserMapper.toUserDtoRequest(item.getOwner()))
                 .id(item.getId())
                 .request(requestDto)
                 .available(item.getAvailable())
@@ -58,7 +58,7 @@ public class ItemMapper {
         return ItemDtoWithBookingDateResponse.builder()
                 .name(item.getName())
                 .description(item.getDescription())
-                .owner(UserMapper.toUserDto(item.getOwner()))
+                .owner(UserMapper.toUserDtoResponse(item.getOwner()))
                 .id(item.getId())
                 .request(requestDto)
                 .available(item.getAvailable())
@@ -77,7 +77,7 @@ public class ItemMapper {
                         .end(item.getLastBooking().getEnd())
                         .build())
                 .comments(item.getComments() == null ? null :
-                    item.getComments().stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()))
+                    item.getComments().stream().map(CommentMapper::toCommentDtoResponse).collect(Collectors.toList()))
                 .build();
     }
 
