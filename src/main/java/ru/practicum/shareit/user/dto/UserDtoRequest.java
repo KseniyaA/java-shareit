@@ -14,7 +14,7 @@ public class UserDtoRequest {
 
     @NotBlank(groups = Marker.OnCreate.class,
             message = "Поле email не должно быть пустым")
-    @Email(groups = {Marker.OnCreate.class, Marker.OnUpdate.class} ,
+    @Email(groups = {Marker.OnCreate.class, Marker.OnUpdate.class},
             message = "Не верный формат электронной почты")
     private String email;
 
