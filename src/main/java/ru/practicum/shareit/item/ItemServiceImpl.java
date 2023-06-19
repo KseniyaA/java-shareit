@@ -59,17 +59,19 @@ public class ItemServiceImpl implements ItemService {
                     user.getId(), item.getId());
             throw new ItemIncorrectOwnerException(error);
         }
-
-        Item newItem = Item.builder()
-                .id(item.getId())
-                .name(item.getName() == null || item.getName().isBlank() ? oldItem.getName() : item.getName())
-                .description(item.getDescription() == null || item.getDescription().isBlank() ?
-                        oldItem.getDescription() : item.getDescription())
-                .available(item.getAvailable() == null ? oldItem.getAvailable() : item.getAvailable())
-                .owner(item.getOwner() == null ? oldItem.getOwner() : item.getOwner())
-                .build();
-
-        return itemRepository.save(newItem);
+        if (item.getName() != null && !item.getName().isBlank()) {
+            oldItem.setName(item.getName());
+        }
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+            oldItem.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            oldItem.setAvailable(item.getAvailable());
+        }
+        if (item.getOwner() != null) {
+            oldItem.setOwner(item.getOwner());
+        }
+        return oldItem;
     }
 
     @Override

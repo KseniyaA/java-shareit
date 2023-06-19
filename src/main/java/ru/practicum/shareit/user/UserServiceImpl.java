@@ -21,14 +21,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public User update(User user) {
         User oldUser = getById(user.getId());
-        User newUser = new User();
-        newUser.setId(user.getId());
-        newUser.setName(user.getName() == null || user.getName().isBlank() ? oldUser.getName() : user.getName());
-        newUser.setEmail(user.getEmail() == null || user.getEmail().isBlank() ? oldUser.getEmail() : user.getEmail());
-        return userRepository.save(newUser);
+        if (user.getName() != null && !user.getName().isBlank()) {
+            oldUser.setName(user.getName());
+        }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            oldUser.setEmail(user.getEmail());
+        }
+        return oldUser;
     }
 
     @Override
