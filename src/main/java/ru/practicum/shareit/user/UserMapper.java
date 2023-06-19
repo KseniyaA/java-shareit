@@ -1,44 +1,54 @@
 package ru.practicum.shareit.user;
 
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserDtoCreateRequest;
-import ru.practicum.shareit.user.dto.UserDtoUpdateRequest;
+import lombok.experimental.UtilityClass;
+import ru.practicum.shareit.user.dto.UserDtoRequest;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class UserMapper {
 
-    public static User convertUserDtoCreateRequestToUser(UserDtoCreateRequest userDto) {
+    public User toUser(UserDtoRequest userDtoRequest) {
         return User.builder()
-                .name(userDto.getName())
-                .email(userDto.getEmail())
+                .id(userDtoRequest.getId())
+                .name(userDtoRequest.getName())
+                .email(userDtoRequest.getEmail())
                 .build();
     }
 
-    public static UserDto toUserDto(User user) {
-        return UserDto.builder()
+
+    public UserDtoRequest toUserDtoRequest(User user) {
+        return UserDtoRequest.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
     }
 
-    public static List<UserDto> toUserDtoList(List<User> users) {
-        return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+    public UserDtoResponse toUserDtoResponse(User user) {
+        return UserDtoResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 
-    public static User toUser(UserDtoUpdateRequest userDto, long userId) {
-        User.UserBuilder userBuilder = User.builder()
-                .id(userId);
-        if (Optional.ofNullable(userDto.getEmail()).isPresent()) {
-            userBuilder.email(userDto.getEmail());
+    public List<UserDtoResponse> toUserDtoResponseList(List<User> users) {
+        return users.stream().map(UserMapper::toUserDtoResponse).collect(Collectors.toList());
+    }
+
+    public User toUser(UserDtoRequest userDtoRequest, long userId) {
+        User.UserBuilder builder = User.builder().id(userId);
+        if (Optional.ofNullable(userDtoRequest.getEmail()).isPresent()) {
+            builder.email(userDtoRequest.getEmail());
         }
-        if (Optional.ofNullable(userDto.getName()).isPresent()) {
-            userBuilder.name(userDto.getName());
+        if (Optional.ofNullable(userDtoRequest.getName()).isPresent()) {
+            builder.name(userDtoRequest.getName());
         }
-        return userBuilder.build();
+        return builder.build();
     }
 }

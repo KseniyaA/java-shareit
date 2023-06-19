@@ -3,6 +3,8 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.common.EntityNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -13,14 +15,23 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public User create(User user) {
-        return userRepository.create(user);
+        return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public User update(User user) {
-        return userRepository.update(user);
+        User oldUser = getById(user.getId());
+        if (user.getName() != null && !user.getName().isBlank()) {
+            oldUser.setName(user.getName());
+        }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            oldUser.setEmail(user.getEmail());
+        }
+        return oldUser;
     }
 
     @Override
@@ -30,11 +41,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(Long id) {
-        return userRepository.getById(id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException("Пользователь с id = " + id + " не найден");
+                });
     }
 
     @Override
     public List<User> getAll() {
-        return userRepository.getAll();
+        return userRepository.findAll();
     }
 }
