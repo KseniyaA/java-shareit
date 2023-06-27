@@ -2,14 +2,13 @@ package ru.practicum.shareit.item;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingSimpleDto;
-import ru.practicum.shareit.item.dto.ItemDtoForRequestResponse;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookingDateResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.request.RequestMapper;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoResponse;
 import ru.practicum.shareit.user.UserMapper;
 
 import java.util.ArrayList;
@@ -50,9 +49,9 @@ public class ItemMapper {
     }
 
     public ItemDtoWithBookingDateResponse toItemDtoWithBookingDateResponse(Item item) {
-        RequestDto requestDto = null;
+        RequestDtoResponse requestDto = null;
         if (item.getRequest() != null) {
-            requestDto = RequestMapper.toRequestDto(item.getRequest());
+            requestDto = RequestMapper.toRequestDtoResponse(item.getRequest());
         }
 
         return ItemDtoWithBookingDateResponse.builder()
@@ -93,16 +92,5 @@ public class ItemMapper {
             itemDtoResponseList.add(toItemDtoResponse(item));
         }
         return itemDtoResponseList;
-    }
-
-    public ItemDtoForRequestResponse toItemDtoForRequestResponse(Item item) {
-        return ItemDtoForRequestResponse.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .requestId(item.getRequest().getId())
-                .ownerId(item.getOwner().getId())
-                .build();
     }
 }

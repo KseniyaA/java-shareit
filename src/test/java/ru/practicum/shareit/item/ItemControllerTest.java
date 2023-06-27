@@ -12,8 +12,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.common.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookingDateResponse;
+import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -53,6 +55,24 @@ public class ItemControllerTest {
                 .description("desc")
                 .available(false)
                 .owner(User.builder().id(1L).build())
+                .build();
+    }
+
+    private Booking makeBooking(Item item, User booker) {
+        return Booking.builder()
+                .id(1L)
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusDays(1))
+                .item(item)
+                .booker(booker)
+                .build();
+    }
+
+    private User makeUser(Long id, String name, String email) {
+        return User.builder()
+                .id(id)
+                .name(name)
+                .email(email)
                 .build();
     }
 
@@ -125,6 +145,23 @@ public class ItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    void updateIncorrectOwnerExceptionTest() throws Exception {
+        Item itemDtoIn = makeItem();
+
+        when(itemService.update(any(), anyLong())).thenThrow(
+                new ItemIncorrectOwnerException("Пользователь не является владельцем вещи")
+        );
+
+        mvc.perform(patch("/items/{itemId}", 1)
+                        .header("X-Sharer-User-Id", 1)
+                        .content(mapper.writeValueAsString(itemDtoIn))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -214,15 +251,14 @@ public class ItemControllerTest {
 
     @Test
     void getAllByUserTest() throws Exception {
-        Item itemDtoIn = makeItem();
+        Item itemDtoOut = makeItem();
 
-        when(itemService.getAllByUser(anyLong(), anyInt(), anyInt())).thenReturn(Arrays.asList(itemDtoIn));
+        when(itemService.getAllByUser(anyLong(), anyInt(), anyInt())).thenReturn(Arrays.asList(itemDtoOut));
 
         MvcResult mvcResult = mvc.perform(get("/items")
                         .param("from", String.valueOf(1))
                         .param("size", String.valueOf(1))
                         .header("X-Sharer-User-Id", 1)
-                        .content(mapper.writeValueAsString(itemDtoIn))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -230,8 +266,8 @@ public class ItemControllerTest {
                 .andReturn();
 
         String contentAsString = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        List<ItemDtoWithBookingDateResponse> users = mapper.readValue(contentAsString, List.class);
-        assertThat(users.size(), equalTo(1));
+        List<ItemDtoWithBookingDateResponse> items = mapper.readValue(contentAsString, List.class);
+        assertThat(items.size(), equalTo(1));
     }
 
     @Test

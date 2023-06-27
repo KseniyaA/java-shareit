@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.common.EntityNotFoundException;
+import ru.practicum.shareit.common.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -124,6 +126,23 @@ class RequestServiceImplTest {
     }
 
     @Test
+    void getAllByUserEmpty() {
+        RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
+
+        User requester1 = makeUser(2L, "requester", "requester@ya.ru");
+        Request request1 = makeRequest("desc request 1");
+        request1.setId(6L);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(requester1));
+        when(requestRepository.findAllByRequesterId(anyLong())).thenReturn(List.of());
+
+        List<Request> requestsByUser = requestService.getAllByUser(request1.getId());
+
+        assertThat(requestsByUser.size(), equalTo(0));
+        verify(itemRepository, times(0)).findByRequestIn(any());
+    }
+
+    @Test
     void getByIdNotFoundUser() {
         User itemOwner = makeUser(1L, "owner", "owner@ya.ru");
         Request request1 = makeRequest("desc request 1");
@@ -178,5 +197,39 @@ class RequestServiceImplTest {
 
         verify(itemRepository, times(1)).findByRequest(any());
         assertThat(byId.getItems().size(), equalTo(1));
+    }
+
+    @Test
+    void getAllNullParamsTest() {
+        RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
+
+        List<Request> all = requestService.getAll(1L, null, null);
+
+        assertThat(all.size(), equalTo(0));
+        verify(userRepository, times(0)).findById(any());
+    }
+
+    @Test
+    void getAllUnavailableParamsTest() {
+        RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
+
+        final ValidationException exception = Assertions.assertThrows(
+                ValidationException.class,
+                () -> requestService.getAll(1L, 0, 0));
+
+        assertTrue(exception.getMessage().contains("Некорректные значения параметров from, size"));
+    }
+
+    @Test
+    void getAllNotFoundTest() {
+        RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
+
+        when(userRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Пользователь не найден"));
+
+        final EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> requestService.getAll(1L, 0, 10));
+
+        assertTrue(exception.getMessage().contains("Пользователь не найден"));
     }
 }

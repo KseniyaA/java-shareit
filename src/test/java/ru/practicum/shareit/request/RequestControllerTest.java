@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.practicum.shareit.common.EntityNotFoundException;
+import ru.practicum.shareit.common.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -23,8 +24,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -160,10 +160,31 @@ public class RequestControllerTest {
     }
 
     @Test
+    void getAllValidationExceptionTest() throws Exception {
+        Request requestDto = makeRequest("desc req");
+        when(requestService.getAll(anyLong(), anyInt(), anyInt())).thenThrow(
+                new ValidationException("Некорректные значения параметров"));
+
+        mvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(10))
+                        .content(mapper.writeValueAsString(requestDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getRequestsByIdTest() throws Exception {
         Request requestDto = makeRequest("desc req");
 
-        Request reqResp = Request.builder().id(1L).description("desc req").created(LocalDateTime.now()).build();
+        Request reqResp = Request.builder()
+                .id(1L)
+                .description("desc req")
+                .created(LocalDateTime.now())
+                .build();
 
         when(requestService.getById(anyLong(), anyLong())).thenReturn(reqResp);
 

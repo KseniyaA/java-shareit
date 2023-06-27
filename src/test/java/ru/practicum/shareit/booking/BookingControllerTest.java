@@ -13,7 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
-import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.booking.exception.BookingIncorrectDataException;
+import ru.practicum.shareit.booking.exception.BookingUnavailableOperationException;
+import ru.practicum.shareit.booking.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
@@ -38,9 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BookingControllerTest {
     @Autowired
     ObjectMapper mapper;
-
-    @MockBean
-    ItemService itemService;
 
     @MockBean
     UserService userService;
@@ -103,6 +102,22 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.booker", notNullValue()))
                 .andExpect(jsonPath("$.status", is(BookingStatus.WAITING.name())))
                 .andReturn();
+    }
+
+    @Test
+    void addNewBookingIncorrectDataTest() throws Exception {
+        BookingDtoRequest bookingDtoIn = makeBooking(2L);
+
+        when(bookingService.create(any(), any())).thenThrow(new BookingIncorrectDataException("Ошибка данных"));
+
+        mvc.perform(post("/bookings")
+                        .content(mapper.writeValueAsString(bookingDtoIn))
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
     }
 
     @Test
@@ -255,6 +270,19 @@ public class BookingControllerTest {
     }
 
     @Test
+    void getUnavailableOperationExceptionTest() throws Exception {
+        when(bookingService.get(anyLong(), anyLong())).thenThrow(new BookingUnavailableOperationException(
+                "Подтверждение или отклонение запроса может быть выполнено только владельцем вещи"));
+
+        mvc.perform(get("/bookings/{bookingId}", 1L)
+                        .header("X-Sharer-User-Id", 2L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getAllBookingsByUserTest() throws Exception {
         User itemOwner = makeUser(1L, "name", "email");
         Item item = makeItem(2L, "name", "desc", itemOwner, true);
@@ -279,6 +307,23 @@ public class BookingControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
         List<BookingDtoResponse> bookings = mapper.readValue(contentAsString, List.class);
         assertThat(bookings.size(), equalTo(2));
+    }
+
+    @Test
+    void getAllUnknownStatusExceptionTest() throws Exception {
+        User booker = makeUser(3L, "booker", "bookerEmail");
+
+        when(userService.getById(anyLong())).thenReturn(booker);
+        when(bookingService.getAllBookingsByUser(anyLong(), anyString(), any(), any()))
+                .thenThrow(new UnsupportedStatusException("unknown state"));
+
+        mvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", booker.getId())
+                        .param("state", "unknown")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

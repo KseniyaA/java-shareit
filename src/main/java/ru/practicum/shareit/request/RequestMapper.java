@@ -2,8 +2,7 @@ package ru.practicum.shareit.request;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemDtoForRequestResponse;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.request.dto.RequestDtoRequest;
 import ru.practicum.shareit.request.dto.RequestDtoResponse;
 import ru.practicum.shareit.user.UserMapper;
@@ -15,12 +14,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class RequestMapper {
-    public RequestDto toRequestDto(Request request) {
-        return RequestDto.builder()
-                .description(request.getDescription())
-                .requester(UserMapper.toUserDtoRequest(request.getRequester()))
-                .build();
-    }
 
     public Request toRequest(RequestDtoRequest requestDto) {
         return Request.builder()
@@ -29,16 +22,17 @@ public class RequestMapper {
     }
 
     public static RequestDtoResponse toRequestDtoResponse(Request request) {
-        List<ItemDtoForRequestResponse> items = request.getItems() == null || request.getItems().isEmpty() ?
+        List<ItemDtoResponse> items = request.getItems() == null || request.getItems().isEmpty() ?
                 Collections.emptyList() :
                 request.getItems().stream()
-                        .map(ItemMapper::toItemDtoForRequestResponse)
+                        .map(ItemMapper::toItemDtoResponse)
                         .collect(Collectors.toList());
         return RequestDtoResponse.builder()
                 .id(request.getId())
                 .description(request.getDescription())
                 .created(request.getCreated())
                 .items(items)
+                .requester(request.getRequester() == null ? null : UserMapper.toUserDtoRequest(request.getRequester()))
                 .build();
     }
 
