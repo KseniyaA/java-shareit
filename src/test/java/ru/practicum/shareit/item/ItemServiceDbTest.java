@@ -92,15 +92,15 @@ public class ItemServiceDbTest {
         itemService.add(itemIn, createdUser.getId());
 
         TypedQuery<Item> query = em.createQuery("Select i from Item i where i.name = :name", Item.class);
-        Item user = query
+        Item items = query
                 .setParameter("name", itemIn.getName())
                 .getSingleResult();
 
-        assertThat(user.getId(), notNullValue());
-        assertThat(user.getName(), equalTo(itemIn.getName()));
-        assertThat(user.getDescription(), equalTo(itemIn.getDescription()));
-        assertFalse(user.getAvailable());
-        assertThat(user.getOwner().getId(), equalTo(1L));
+        assertThat(items.getId(), notNullValue());
+        assertThat(items.getName(), equalTo(itemIn.getName()));
+        assertThat(items.getDescription(), equalTo(itemIn.getDescription()));
+        assertFalse(items.getAvailable());
+        assertThat(items.getOwner().getId(), equalTo(createdUser.getId()));
     }
 
     @Test
