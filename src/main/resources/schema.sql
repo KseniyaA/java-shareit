@@ -11,8 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS requests (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description VARCHAR(255),
-    requestor_id BIGINT,
-    CONSTRAINT fk_requests_to_users FOREIGN KEY(requestor_id) REFERENCES users(id)
+    requester_id BIGINT,
+    created timestamp WITHOUT TIME ZONE NOT NULL,
+    CONSTRAINT fk_requests_to_users FOREIGN KEY(requester_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS items (

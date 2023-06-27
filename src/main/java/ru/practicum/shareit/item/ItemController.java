@@ -42,15 +42,19 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoWithBookingDateResponse> getAllByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
-        List<Item> items = itemService.getAllByUser(userId);
+    public List<ItemDtoWithBookingDateResponse> getAllByUser(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                             @RequestParam(required = false) Integer from,
+                                                             @RequestParam(required = false) Integer size) {
+        List<Item> items = itemService.getAllByUser(userId, from, size);
         return items.stream().map(ItemMapper::toItemDtoWithBookingDateResponse).collect(Collectors.toList());
     }
 
     @GetMapping("/search")
     public List<ItemDtoResponse> search(@RequestHeader("X-Sharer-User-Id") long userId,
-                                        @RequestParam String text) {
-        List<Item> items = itemService.searchByText(text);
+                                        @RequestParam String text,
+                                        @RequestParam(required = false) Integer from,
+                                        @RequestParam(required = false) Integer size) {
+        List<Item> items = itemService.searchByText(text, from, size);
         return ItemMapper.toItemDtoResponseList(items);
     }
 

@@ -54,9 +54,12 @@ public class BookingController {
      */
     @GetMapping
     public List<BookingDtoResponse> getAllBookingsByUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                 @RequestParam(defaultValue = "ALL") String state) {
+                                                         @RequestParam(defaultValue = "ALL") String state,
+                                                         @RequestParam(required = false) Integer from,
+                                                         @RequestParam(required = false) Integer size
+                                                         ) {
         userService.getById(userId);
-        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByUser(userId, state));
+        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByUser(userId, state, from, size));
     }
 
     /**
@@ -65,9 +68,12 @@ public class BookingController {
      */
     @GetMapping("/owner")
     public List<BookingDtoResponse> getAllBookingsByItemOwner(@RequestHeader("X-Sharer-User-Id") long itemOwnerId,
-                                                 @RequestParam(defaultValue = "ALL") String state) {
+                                                              @RequestParam(defaultValue = "ALL") String state,
+                                                              @RequestParam(required = false) Integer from,
+                                                              @RequestParam(required = false) Integer size) {
         userService.getById(itemOwnerId);
-        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByItemOwner(itemOwnerId, state));
+        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByItemOwner(itemOwnerId, state,
+                from, size));
     }
 
 }

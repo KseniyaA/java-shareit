@@ -2,10 +2,12 @@ package ru.practicum.shareit.item;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingSimpleDto;
+import ru.practicum.shareit.item.dto.ItemDtoForRequestResponse;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookingDateResponse;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.request.RequestMapper;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.user.UserMapper;
@@ -22,6 +24,8 @@ public class ItemMapper {
                 .name(itemDtoCreateRequest.getName())
                 .description(itemDtoCreateRequest.getDescription())
                 .available(itemDtoCreateRequest.getAvailable())
+                .request(itemDtoCreateRequest.getRequestId() == null ? null :
+                        Request.builder().id(itemDtoCreateRequest.getRequestId()).build())
                 .build();
     }
 
@@ -35,16 +39,12 @@ public class ItemMapper {
     }
 
     public ItemDtoResponse toItemDtoResponse(Item item) {
-        RequestDto requestDto = null;
-        if (item.getRequest() != null) {
-            requestDto = RequestMapper.toRequestDto(item.getRequest());
-        }
         return ItemDtoResponse.builder()
                 .name(item.getName())
                 .description(item.getDescription())
                 .owner(UserMapper.toUserDtoRequest(item.getOwner()))
                 .id(item.getId())
-                .request(requestDto)
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
                 .available(item.getAvailable())
                 .build();
     }
@@ -93,5 +93,16 @@ public class ItemMapper {
             itemDtoResponseList.add(toItemDtoResponse(item));
         }
         return itemDtoResponseList;
+    }
+
+    public ItemDtoForRequestResponse toItemDtoForRequestResponse(Item item) {
+        return ItemDtoForRequestResponse.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .requestId(item.getRequest().getId())
+                .ownerId(item.getOwner().getId())
+                .build();
     }
 }

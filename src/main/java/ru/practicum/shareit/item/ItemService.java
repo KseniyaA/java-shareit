@@ -13,9 +13,9 @@ public interface ItemService {
 
     Item get(long id, long userId);
 
-    List<Item> getAllByUser(Long userId);
+    List<Item> getAllByUser(Long userId, Integer from, Integer size);
 
-    List<Item> searchByText(String text);
+    List<Item> searchByText(String text, Integer from, Integer size);
 
     List<Booking> getBookingByItem(Item item);
 
