@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.dto.BookingSimpleDto;
 import ru.practicum.shareit.common.EntityNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookingDateResponse;
 import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
 import ru.practicum.shareit.item.model.Comment;
@@ -209,6 +213,51 @@ public class ItemControllerTest {
     }
 
     @Test
+    void getItemSuccessCheckDtoTest() throws Exception {
+        Item itemDtoIn = makeItem();
+        User booker = makeUser(1L, "name", "email");
+        Booking booking1 = makeBooking(itemDtoIn, booker);
+        Booking booking2 = makeBooking(itemDtoIn, booker);
+        itemDtoIn.setLastBooking(booking1);
+        itemDtoIn.setNextBooking(booking2);
+
+        when(itemService.get(anyLong(), anyLong())).thenReturn(itemDtoIn);
+
+        MvcResult mvcResult = mvc.perform(get("/items/{itemId}", 999)
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(itemDtoIn.getId()), Long.class))
+                .andExpect(jsonPath("$.name", is(itemDtoIn.getName())))
+                .andExpect(jsonPath("$.description", is(itemDtoIn.getDescription())))
+                .andExpect(jsonPath("$.owner", notNullValue()))
+                .andExpect(jsonPath("$.available", is(itemDtoIn.getAvailable())))
+                .andExpect(jsonPath("$.request", nullValue()))
+                .andExpect(jsonPath("$.lastBooking", notNullValue()))
+                .andExpect(jsonPath("$.lastBooking.id", notNullValue()))
+                .andExpect(jsonPath("$.lastBooking.itemId", notNullValue()))
+                .andExpect(jsonPath("$.lastBooking.bookerId", notNullValue()))
+                .andExpect(jsonPath("$.lastBooking.start", notNullValue()))
+                .andExpect(jsonPath("$.lastBooking.end", notNullValue()))
+                .andExpect(jsonPath("$.nextBooking", notNullValue()))
+                .andExpect(jsonPath("$.nextBooking.itemId", notNullValue()))
+                .andExpect(jsonPath("$.nextBooking.bookerId", notNullValue()))
+                .andExpect(jsonPath("$.nextBooking.start", notNullValue()))
+                .andExpect(jsonPath("$.nextBooking.end", notNullValue()))
+                .andExpect(jsonPath("$.comments", nullValue()))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        Object lastBooking = JsonPath.read(response, "$.lastBooking");
+        BookingSimpleDto lastBookingResponse = mapper.convertValue(lastBooking, new TypeReference<BookingSimpleDto>(){});
+        assertThat(lastBookingResponse.getId(), equalTo(1L));
+        assertThat(lastBookingResponse.getItemId(), equalTo(1L));
+        assertThat(lastBookingResponse.getBookerId(), equalTo(booker.getId()));
+    }
+
+    @Test
     void getNoItemFailTest() throws Exception {
         Item itemDtoIn = makeItem();
 
@@ -328,7 +377,7 @@ public class ItemControllerTest {
 
         when(itemService.createComment(any(), anyLong(), anyLong())).thenReturn(commentDtoOut);
 
-        mvc.perform(post("/items/{itemId}/comment", 1)
+        MvcResult mvcResult = mvc.perform(post("/items/{itemId}/comment", 1)
                         .header("X-Sharer-User-Id", 1)
                         .content(mapper.writeValueAsString(commentDtoIn))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -340,6 +389,12 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.authorName", is(commentDtoOut.getAuthor().getName())))
                 .andExpect(jsonPath("$.created", notNullValue()))
                 .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CommentDtoResponse response = mapper.readValue(contentAsString, CommentDtoResponse.class);
+        assertThat(response.getId(), equalTo(commentDtoOut.getId()));
+        assertThat(response.getText(), equalTo(commentDtoOut.getText()));
+        assertThat(response.getAuthorName(), equalTo(commentDtoOut.getAuthor().getName()));
     }
 
     @Test
