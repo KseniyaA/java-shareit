@@ -109,8 +109,8 @@ public class RequestServiceDbTest {
 
         assertThat(allByUser.size(), equalTo(0));
 
-        Item createdItemByRequest = itemService.add(Item.builder().name("name").description("desc").available(true).request(createdRequest1).build()
-                , createdUser2.getId());
+        Item itemDto = Item.builder().name("name").description("desc").available(true).request(createdRequest1).build();
+        Item createdItemByRequest = itemService.add(itemDto, createdUser2.getId());
         allByUser = requestService.getAll(createdUser2.getId(), 0, 10);
         assertThat(allByUser.size(), equalTo(1));
     }

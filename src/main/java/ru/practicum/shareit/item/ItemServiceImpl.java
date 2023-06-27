@@ -105,7 +105,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items;
         if (byPage) {
             List<Item> itemsResult = new ArrayList<>();
-            Pageable page = PageRequest.of(from/size, size, Sort.by("id").ascending());
+            Pageable page = PageRequest.of(from / size, size, Sort.by("id").ascending());
             do {
                 Page<Item> itemsPage = itemRepository.findAllByOwnerId(user.getId(), page);
                 itemsResult.addAll(itemsPage.getContent());
@@ -144,7 +144,7 @@ public class ItemServiceImpl implements ItemService {
         }
         if (from != null && size != null) {
             List<Item> itemsResult = new ArrayList<>();
-            Pageable page = PageRequest.of(from/size, size, Sort.by("id").ascending());
+            Pageable page = PageRequest.of(from / size, size, Sort.by("id").ascending());
             do {
                 Page<Item> itemsPage = itemRepository.searchByText(text, page);
                 itemsResult.addAll(itemsPage.getContent());

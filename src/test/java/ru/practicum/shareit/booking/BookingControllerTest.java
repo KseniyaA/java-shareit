@@ -330,10 +330,9 @@ public class BookingControllerTest {
 
     @NoArgsConstructor
     @Getter
-    private static class Violations{
+    private static class Violations {
         @JsonProperty("violations")
         public List<Violation> violations;
-
     }
 
     @NoArgsConstructor

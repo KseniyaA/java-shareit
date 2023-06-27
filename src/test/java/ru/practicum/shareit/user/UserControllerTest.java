@@ -58,7 +58,7 @@ public class UserControllerTest {
     @Test
     void saveNewUserSuccessTest() throws Exception {
         User userDtoIn = makeUser("name", "name@ya.ru");
-        User userDtoOut = makeUser(1L , "name", "name@ya.ru");
+        User userDtoOut = makeUser(1L, "name", "name@ya.ru");
 
         when(userService.create(any()))
                 .thenReturn(userDtoOut);
@@ -130,7 +130,7 @@ public class UserControllerTest {
 
     @Test
     void updateUserSuccessTest() throws Exception {
-        User userDtoOut = makeUser(1L , "name", "name@ya.ru");
+        User userDtoOut = makeUser(1L, "name", "name@ya.ru");
 
         when(userService.update(any())).thenReturn(userDtoOut);
 
@@ -184,13 +184,13 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(result -> assertThat(result.getResolvedException() instanceof EntityNotFoundException
-                        , is(true)));
+                .andExpect(result -> assertThat(result.getResolvedException() instanceof EntityNotFoundException,
+                        is(true)));
     }
 
     @Test
     void getByIdSuccessTest() throws Exception {
-        User userDtoOut = makeUser(1L , "name", "name@ya.ru");
+        User userDtoOut = makeUser(1L, "name", "name@ya.ru");
 
         when(userService.getById(any())).thenReturn(userDtoOut);
 
@@ -213,14 +213,14 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(result -> assertThat(result.getResolvedException() instanceof EntityNotFoundException
-                        , is(true)));
+                .andExpect(result -> assertThat(result.getResolvedException() instanceof EntityNotFoundException,
+                        is(true)));
     }
 
     @Test
     void getAllSuccessTest() throws Exception {
-        User userDtoOut1 = makeUser(1L , "name", "name@ya.ru");
-        User userDtoOut2 = makeUser(2L , "name2", "name2@ya.ru");
+        User userDtoOut1 = makeUser(1L, "name", "name@ya.ru");
+        User userDtoOut2 = makeUser(2L, "name2", "name2@ya.ru");
 
         when(userService.getAll()).thenReturn(Arrays.asList(userDtoOut1, userDtoOut2));
 
@@ -238,10 +238,9 @@ public class UserControllerTest {
 
     @NoArgsConstructor
     @Getter
-    private static class Violations{
+    private static class Violations {
         @JsonProperty("violations")
         public List<Violation> violations;
-
     }
 
     @NoArgsConstructor

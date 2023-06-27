@@ -280,8 +280,8 @@ public class ItemServiceDbTest {
         Comment createdComment = itemService.createComment(Comment.builder().text("text comment").build(),
                 booker.getId(), item.getId());
 
-        TypedQuery<Comment> query = em.createQuery("select c from Comment c join c.item as i where i.id = :itemId"
-                , Comment.class);
+        TypedQuery<Comment> query = em.createQuery("select c from Comment c join c.item as i where i.id = :itemId",
+                Comment.class);
         List<Comment> commentDb = query
                 .setParameter("itemId", item.getId())
                 .getResultList();

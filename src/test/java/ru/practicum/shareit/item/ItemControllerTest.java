@@ -184,8 +184,8 @@ public class ItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(result -> assertThat(result.getResolvedException() instanceof EntityNotFoundException
-                        , is(true)));
+                .andExpect(result -> assertThat(result.getResolvedException() instanceof EntityNotFoundException,
+                        is(true)));
     }
 
     @Test
@@ -213,7 +213,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void getAllByUserTest() throws Exception{
+    void getAllByUserTest() throws Exception {
         Item itemDtoIn = makeItem();
 
         when(itemService.getAllByUser(anyLong(), anyInt(), anyInt())).thenReturn(Arrays.asList(itemDtoIn));
@@ -235,7 +235,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void searchSuccessTest() throws Exception{
+    void searchSuccessTest() throws Exception {
         Item itemDtoIn = makeItem();
 
         when(itemService.searchByText(anyString(), anyInt(), anyInt())).thenReturn(Arrays.asList(itemDtoIn));
@@ -258,7 +258,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void searchNoTextParamTest() throws Exception{
+    void searchNoTextParamTest() throws Exception {
         Item itemDtoIn = makeItem();
 
         when(itemService.searchByText(anyString(), anyInt(), anyInt())).thenReturn(Arrays.asList(itemDtoIn));
@@ -368,10 +368,9 @@ public class ItemControllerTest {
 
     @NoArgsConstructor
     @Getter
-    private static class Violations{
+    private static class Violations {
         @JsonProperty("violations")
         public List<Violation> violations;
-
     }
 
     @NoArgsConstructor

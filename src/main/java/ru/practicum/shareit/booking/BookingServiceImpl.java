@@ -162,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
             byPage = true;
         }
         if (byPage) {
-            Pageable page = PageRequest.of(from/size, size, sort);
+            Pageable page = PageRequest.of(from / size, size, sort);
             do {
                 Page<Booking> bookingsPage = bookingRepository.findAll(predicate, page);
                 bookings.addAll(bookingsPage.getContent());

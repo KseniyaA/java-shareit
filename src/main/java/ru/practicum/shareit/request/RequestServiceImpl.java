@@ -77,7 +77,7 @@ public class RequestServiceImpl implements RequestService {
 
         List<Request> requestsResult = new ArrayList<>();
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-        Pageable page = PageRequest.of(from/size, size, sortById);
+        Pageable page = PageRequest.of(from / size, size, sortById);
         do {
             Page<Request> requestsPage = requestRepository.findAll(userId, page);
             List<Request> requests = requestsPage.getContent();
