@@ -102,14 +102,13 @@ class ItemServiceImplTest {
 
         Item itemIn = makeItem("name", "desc", false);
 
-        when(userRepository.findById(anyLong()))
-                .thenThrow(new EntityNotFoundException("Пользователь не найден"));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> itemService.add(itemIn, 1L));
 
-        Assertions.assertEquals("Пользователь не найден", exception.getMessage());
+        Assertions.assertEquals("Пользователь с id = 1 не существует", exception.getMessage());
     }
 
     @Test
@@ -137,14 +136,13 @@ class ItemServiceImplTest {
         User user = makeUser(1L, "name", "email");
         Item itemRes = makeItem(1L, "updatedName", "updatedDesc", false, user);
 
-        when(userRepository.findById(anyLong()))
-                .thenThrow(new EntityNotFoundException("Пользователь не найден"));;
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());;
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> itemService.update(itemRes, user.getId()));
 
-        Assertions.assertEquals("Пользователь не найден", exception.getMessage());
+        Assertions.assertEquals("Пользователь с id = " + user.getId() + " не существует", exception.getMessage());
     }
 
     @Test
@@ -183,6 +181,19 @@ class ItemServiceImplTest {
 
         assertThat(selectedItem.getLastBooking(), nullValue());
         assertThat(selectedItem.getNextBooking(), nullValue());
+    }
+
+    @Test
+    void getItemNotFoundTest() {
+        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository);
+
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        final EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> itemService.get(1, 2));
+
+        assertThat(exception.getMessage(), equalTo("Вещь с id = 1 не найдена"));
     }
 
     @Test
@@ -277,6 +288,21 @@ class ItemServiceImplTest {
 
         verify(itemRepository, times(1)).findAllByOwnerId(anyLong(), any());
         verify(itemRepository, times(0)).findAllByOwnerId(anyLong());
+    }
+
+    @Test
+    void getAllByUserUserNotFoundTest() {
+        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository);
+        User user1 = makeUser(1L, "name", "email");
+        Item itemReq = makeItem(1L, "updatedName", "updatedDesc", false, user1);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        final EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> itemService.getAllByUser(1L, 0, 10));
+
+        assertThat(exception.getMessage(), equalTo("Пользователь с id = 1 не существует"));
     }
 
     @Test

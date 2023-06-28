@@ -67,6 +67,24 @@ class RequestServiceImplTest {
     }
 
     @Test
+    void addNotFoundRequesterTest2() {
+        User itemOwner = makeUser(1L, "user", "user@ya.ru");
+        User requester = makeUser(2L, "requester", "requester@ya.ru");
+        Item item = makeItem(3L, "item", "itemDesc", itemOwner, true);
+        Request request = makeRequest("desc request");
+
+        RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        final EntityNotFoundException exception = Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> requestService.add(request, requester.getId()));
+
+        assertThat(exception.getMessage(), equalTo("Пользователь с id = 2 не существует"));
+        verify(requestRepository, times(0)).save(any());
+    }
+
+    @Test
     void addTest() {
         User itemOwner = makeUser(1L, "user", "user@ya.ru");
         User requester = makeUser(2L, "requester", "requester@ya.ru");
@@ -89,13 +107,13 @@ class RequestServiceImplTest {
         User requester = makeUser(2L, "requester", "requester@ya.ru");
 
         RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
-        when(userRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Пользователь не найден"));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> requestService.getAllByUser(requester.getId()));
 
-        assertThat(exception.getMessage(), equalTo("Пользователь не найден"));
+        assertThat(exception.getMessage(), equalTo("Пользователь с id = " + requester.getId() + " не существует"));
         verify(requestRepository, times(0)).save(any());
     }
 
@@ -149,13 +167,13 @@ class RequestServiceImplTest {
         request1.setId(6L);
 
         RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
-        when(userRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Пользователь не найден"));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> requestService.getById(request1.getId(), itemOwner.getId()));
 
-        assertThat(exception.getMessage(), equalTo("Пользователь не найден"));
+        assertThat(exception.getMessage(), equalTo("Пользователь с id = " + itemOwner.getId() + " не существует"));
         verify(requestRepository, times(0)).save(any());
     }
 
@@ -168,13 +186,13 @@ class RequestServiceImplTest {
         Request request1 = makeRequest("desc request 1");
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(requester1));
-        when(requestRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Запрос не найден"));
+        when(requestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> requestService.getById(request1.getId(), itemOwner.getId()));
 
-        assertThat(exception.getMessage(), equalTo("Запрос не найден"));
+        assertThat(exception.getMessage(), equalTo("Запрос с id = " + request1.getId() + " не найден"));
         verify(itemRepository, times(0)).findByRequest(any());
     }
 
@@ -224,12 +242,12 @@ class RequestServiceImplTest {
     void getAllNotFoundTest() {
         RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
 
-        when(userRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Пользователь не найден"));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> requestService.getAll(1L, 0, 10));
 
-        assertTrue(exception.getMessage().contains("Пользователь не найден"));
+        assertThat(exception.getMessage(), equalTo("Пользователь с id = 1 не существует"));
     }
 }

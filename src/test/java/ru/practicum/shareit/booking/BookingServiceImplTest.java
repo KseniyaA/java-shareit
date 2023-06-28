@@ -60,13 +60,12 @@ class BookingServiceImplTest {
         User itemOwner = makeUser(2L, "name2", "email2");
         Item item = makeItem(3L, "name", "desc", itemOwner, true);
 
-        when(itemRepository.findById(anyLong()))
-                .thenThrow(new EntityNotFoundException("Вещь с id = 1 не найдена"));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> service.create(makeBooking(item), booker));
-        assertThat(exception.getMessage(), equalTo("Вещь с id = 1 не найдена"));
+        assertThat(exception.getMessage(), equalTo("Вещь с id = " + item.getId() + " не найдена"));
 
         verify(itemRepository, times(0)).save(any());
     }
@@ -153,8 +152,7 @@ class BookingServiceImplTest {
     void getByIdNotFoundTest() {
         BookingService service = new BookingServiceImpl(bookingRepository, itemRepository);
 
-        when(bookingRepository.findById(anyLong()))
-                .thenThrow(new EntityNotFoundException("Бронирование c id = 1 не найдено"));
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         final EntityNotFoundException exception = Assertions.assertThrows(
                 EntityNotFoundException.class,
