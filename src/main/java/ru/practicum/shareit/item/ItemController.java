@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.common.Marker;
+import ru.practicum.shareit.common.ValidateFromIfPresent;
+import ru.practicum.shareit.common.ValidateSizeIfPresent;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @RequestMapping(path = "/items")
 public class ItemController {
     private final ItemService itemService;
@@ -43,8 +46,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoWithBookingDateResponse> getAllByUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                             @RequestParam(required = false) Integer from,
-                                                             @RequestParam(required = false) Integer size) {
+                                                             @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+                                                             @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
         List<Item> items = itemService.getAllByUser(userId, from, size);
         return items.stream().map(ItemMapper::toItemDtoWithBookingDateResponse).collect(Collectors.toList());
     }
@@ -52,8 +55,8 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDtoResponse> search(@RequestHeader("X-Sharer-User-Id") long userId,
                                         @RequestParam String text,
-                                        @RequestParam(required = false) Integer from,
-                                        @RequestParam(required = false) Integer size) {
+                                        @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+                                        @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
         List<Item> items = itemService.searchByText(text, from, size);
         return ItemMapper.toItemDtoResponseList(items);
     }

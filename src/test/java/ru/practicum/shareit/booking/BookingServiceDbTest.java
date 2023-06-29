@@ -220,6 +220,35 @@ public class BookingServiceDbTest {
     }
 
     @Test
+    void getAllBookingsByItemOwnerALLPageTest() {
+        User itemOwner = userService.create(makeUser("userName", "userEmail@ya.ru"));
+        Item createdItem = itemService.add(makeItem("itemName", "itemDesc", true), itemOwner.getId());
+        User booker = userService.create(makeUser("bookerNam2", "bookerEmail@ya.ru"));
+        Booking bookingDto1 = makeBooking(booker, createdItem);
+        bookingDto1.setStart(LocalDateTime.now().plusMinutes(100));
+        bookingDto1.setEnd(LocalDateTime.now().plusMinutes(200));
+
+        Booking bookingDto2 = makeBooking(booker, createdItem);
+        bookingDto2.setStart(LocalDateTime.now().plusMinutes(10));
+        bookingDto2.setEnd(LocalDateTime.now().plusMinutes(20));
+
+        Booking createdBooking1 = bookingService.create(bookingDto1, booker);
+        Booking createdBooking2 = bookingService.create(bookingDto2, booker);
+
+        List<Booking> byService = bookingService.getAllBookingsByItemOwner(itemOwner.getId(), "ALL", 0, 1);
+
+        assertThat(byService.size(), equalTo(1));
+        assertThat(byService.get(0).getId(), equalTo(createdBooking1.getId()));
+
+        byService = bookingService.getAllBookingsByItemOwner(itemOwner.getId(), "ALL", 0, 10);
+
+        assertThat(byService.size(), equalTo(2));
+        assertThat(byService.get(0).getId(), equalTo(createdBooking1.getId()));
+        assertThat(byService.get(1).getId(), equalTo(createdBooking2.getId()));
+
+    }
+
+    @Test
     void getAllBookingsByItemOwnerCURRENTTest() {
         User itemOwner = userService.create(makeUser("userName", "userEmail@ya.ru"));
         Item createdItem = itemService.add(makeItem("itemName", "itemDesc", true), itemOwner.getId());

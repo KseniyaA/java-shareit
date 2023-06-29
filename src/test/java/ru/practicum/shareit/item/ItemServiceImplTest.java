@@ -197,26 +197,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void getAllByUserValidationFailTest() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository);
-
-        final ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
-                () -> itemService.getAllByUser(1L, 0, 0));
-        assertTrue(exception.getMessage().contains("Некорректные значения для параметров from, size"));
-
-        final ValidationException exception2 = Assertions.assertThrows(
-                ValidationException.class,
-                () -> itemService.getAllByUser(1L, -1, 1));
-        assertTrue(exception2.getMessage().contains("Некорректные значения для параметров from, size"));
-
-        final ValidationException exception3 = Assertions.assertThrows(
-                ValidationException.class,
-                () -> itemService.getAllByUser(1L, 0, -1));
-        assertTrue(exception3.getMessage().contains("Некорректные значения для параметров from, size"));
-    }
-
-    @Test
     void searchByNullBlankTextTest() {
         ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository);
 
@@ -225,26 +205,6 @@ class ItemServiceImplTest {
 
         List<Item> items2 = itemService.searchByText("", 0, 10);
         assertThat(items2.size(), equalTo(0));
-    }
-
-    @Test
-    void searchByTextTest() {
-        ItemService itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository);
-
-        final ValidationException exception1 = Assertions.assertThrows(
-                ValidationException.class,
-                () -> itemService.searchByText("text", 0, 0));
-        assertTrue(exception1.getMessage().contains("Некорректные значения для параметров from, size"));
-
-        final ValidationException exception2 = Assertions.assertThrows(
-                ValidationException.class,
-                () -> itemService.searchByText("text", -1, 0));
-        assertTrue(exception2.getMessage().contains("Некорректные значения для параметров from, size"));
-
-        final ValidationException exception3 = Assertions.assertThrows(
-                ValidationException.class,
-                () -> itemService.searchByText("text", 0, -1));
-        assertTrue(exception3.getMessage().contains("Некорректные значения для параметров from, size"));
     }
 
     @Test

@@ -16,6 +16,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.exception.BookingIncorrectDataException;
 import ru.practicum.shareit.booking.exception.BookingUnavailableOperationException;
 import ru.practicum.shareit.booking.exception.UnsupportedStatusException;
+import ru.practicum.shareit.common.ErrorResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
@@ -371,6 +372,24 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    void getAllBookingsByItemOwnerCheckSizeTest() throws Exception {
+        MvcResult mvcResult = mvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state", "ALL")
+                        .param("size", String.valueOf(0))
+                        .param("from", String.valueOf(-1))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andReturn();
+
+        ErrorResponse violations = mapper.readValue(mvcResult.getResponse().getContentAsString(), ErrorResponse.class);
+        assertThat(violations.getDescription().contains("From must be more or equal 0 if present"), is(true));
+        assertThat(violations.getDescription().contains("Size must positive if present"), is(true));
     }
 
     @NoArgsConstructor

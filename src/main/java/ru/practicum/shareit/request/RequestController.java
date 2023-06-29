@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.common.Marker;
+import ru.practicum.shareit.common.ValidateFromIfPresent;
+import ru.practicum.shareit.common.ValidateSizeIfPresent;
 import ru.practicum.shareit.request.dto.RequestDtoRequest;
 import ru.practicum.shareit.request.dto.RequestDtoResponse;
 
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @RequestMapping(path = "/requests")
 public class RequestController {
     private final RequestService requestService;
@@ -38,8 +41,8 @@ public class RequestController {
      */
     @GetMapping("/all")
     public List<RequestDtoResponse> getRequests(@RequestHeader("X-Sharer-User-Id") long userId,
-                                          @RequestParam(required = false) Integer from,
-                                          @RequestParam(required = false) Integer size) {
+                                          @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+                                          @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
         List<Request> requests = requestService.getAll(userId, from, size);
         return RequestMapper.toRequestDtoResponseList(requests);
     }

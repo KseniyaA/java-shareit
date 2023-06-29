@@ -22,7 +22,6 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +92,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> getAllByUser(Long userId, Integer from, Integer size) {
-        if (from != null && size != null && !(from >= 0 && size >= 1)) {
-            throw new ValidationException("Некорректные значения для параметров from, size");
-        }
         Boolean byPage = (from != null && size != null && from >= 0 && size >= 1);
         LocalDateTime now = LocalDateTime.now();
         User user = userRepository.findById(userId).orElseThrow(() -> {
@@ -104,18 +100,9 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> items;
         if (byPage) {
-            List<Item> itemsResult = new ArrayList<>();
             Pageable page = PageRequest.of(from / size, size, Sort.by("id").ascending());
-            do {
-                Page<Item> itemsPage = itemRepository.findAllByOwnerId(user.getId(), page);
-                itemsResult.addAll(itemsPage.getContent());
-                if (itemsPage.hasNext()) {
-                    page = PageRequest.of(itemsPage.getNumber() + 1, itemsPage.getSize(), itemsPage.getSort());
-                } else {
-                    page = null;
-                }
-            } while (page != null);
-            return itemsResult;
+            Page<Item> itemsPage = itemRepository.findAllByOwnerId(user.getId(), page);
+            return itemsPage.getContent();
         } else {
             items = itemRepository.findAllByOwnerId(user.getId());
         }
@@ -139,22 +126,10 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        if (from != null && size != null && !(from >= 0 && size >= 1)) {
-            throw new ValidationException("Некорректные значения для параметров from, size");
-        }
         if (from != null && size != null) {
-            List<Item> itemsResult = new ArrayList<>();
             Pageable page = PageRequest.of(from / size, size, Sort.by("id").ascending());
-            do {
-                Page<Item> itemsPage = itemRepository.searchByText(text, page);
-                itemsResult.addAll(itemsPage.getContent());
-                if (itemsPage.hasNext()) {
-                    page = PageRequest.of(itemsPage.getNumber() + 1, itemsPage.getSize(), itemsPage.getSort());
-                } else {
-                    page = null;
-                }
-            } while (page != null);
-            return itemsResult;
+            Page<Item> itemsPage = itemRepository.searchByText(text, page);
+            return itemsPage.getContent();
         } else {
             return itemRepository.searchByText(text);
         }

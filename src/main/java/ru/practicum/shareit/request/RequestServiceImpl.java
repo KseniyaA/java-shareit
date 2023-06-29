@@ -9,7 +9,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.common.EntityNotFoundException;
-import ru.practicum.shareit.common.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
@@ -68,34 +67,24 @@ public class RequestServiceImpl implements RequestService {
         if (from == null && size == null) {
             return Collections.emptyList();
         }
-        if (!(from >= 0 && size > 0)) {
-            throw new ValidationException("Некорректные значения параметров from, size");
-        }
         userRepository.findById(userId).orElseThrow(() -> {
             throw new EntityNotFoundException("Пользователь с id = " + userId + " не существует");
         });
 
-        List<Request> requestsResult = new ArrayList<>();
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         Pageable page = PageRequest.of(from / size, size, sortById);
-        do {
-            Page<Request> requestsPage = requestRepository.findAll(userId, page);
-            List<Request> requests = requestsPage.getContent();
-            if (requests.isEmpty()) {
-                return requestsResult;
-            }
-            Map<Request, List<Item>> itemsByRequest = itemRepository.findByRequestIn(requests)
-                    .stream()
-                    .collect(groupingBy(Item::getRequest, toList()));
-            requests.forEach(x -> x.setItems(itemsByRequest.get(x)));
-            requestsResult.addAll(requests);
-            if (requestsPage.hasNext()) {
-                page = PageRequest.of(requestsPage.getNumber() + 1, requestsPage.getSize(), requestsPage.getSort());
-            } else {
-                page = null;
-            }
-        } while (page != null);
-        return requestsResult;
+
+        Page<Request> requestsPage = requestRepository.findAll(userId, page);
+        List<Request> requests = requestsPage.getContent();
+        if (requests.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Map<Request, List<Item>> itemsByRequest = itemRepository.findByRequestIn(requests)
+                .stream()
+                .collect(groupingBy(Item::getRequest, toList()));
+        requests.forEach(x -> x.setItems(itemsByRequest.get(x)));
+
+        return requests;
     }
 
     @Override

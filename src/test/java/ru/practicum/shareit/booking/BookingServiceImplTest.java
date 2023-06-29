@@ -250,29 +250,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsByUserIncorrectFromSize() {
-        BookingService service = new BookingServiceImpl(bookingRepository, itemRepository);
-
-        BookingIncorrectDataException exception = Assertions.assertThrows(
-                BookingIncorrectDataException.class,
-                () -> service.getAllBookingsByUser(1L, "ALL", 0, 0));
-
-        assertThat("Некорректные значения для параметров from, size", equalTo(exception.getMessage()));
-
-        exception = Assertions.assertThrows(
-                BookingIncorrectDataException.class,
-                () -> service.getAllBookingsByUser(1L, "ALL", -1, 0));
-
-        assertThat("Некорректные значения для параметров from, size", equalTo(exception.getMessage()));
-
-        exception = Assertions.assertThrows(
-                BookingIncorrectDataException.class,
-                () -> service.getAllBookingsByUser(1L, "ALL", 0, -1));
-
-        assertThat("Некорректные значения для параметров from, size", equalTo(exception.getMessage()));
-    }
-
-    @Test
     void getAllBookingsByUserPageableTest() {
         BookingService service = new BookingServiceImpl(bookingRepository, itemRepository);
         Page<Booking> bookingsPage = Page.empty();
@@ -299,30 +276,6 @@ class BookingServiceImplTest {
 
         verify(bookingRepository, times(1)).findAll(any(Predicate.class), any(Sort.class));
         verify(bookingRepository, times(0)).findAll(any(Predicate.class), any(Pageable.class));
-    }
-
-    @Test
-    void getAllBookingsByItemOwnerIncorrectFromSize() {
-        BookingService service = new BookingServiceImpl(bookingRepository, itemRepository);
-
-        BookingIncorrectDataException exception = Assertions.assertThrows(
-                BookingIncorrectDataException.class,
-                () -> service.getAllBookingsByItemOwner(1L, "ALL", 0, 0));
-
-        assertThat("Некорректные значения для параметров from, size", equalTo(exception.getMessage()));
-
-        exception = Assertions.assertThrows(
-                BookingIncorrectDataException.class,
-                () -> service.getAllBookingsByItemOwner(1L, "ALL", -1, 0));
-
-        assertThat("Некорректные значения для параметров from, size", equalTo(exception.getMessage()));
-
-        exception = Assertions.assertThrows(
-                BookingIncorrectDataException.class,
-                () -> service.getAllBookingsByItemOwner(1L, "ALL", 0, -1));
-
-        assertThat("Некорректные значения для параметров from, size", equalTo(exception.getMessage()));
-
     }
 
     @Test

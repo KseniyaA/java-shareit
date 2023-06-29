@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.common.EntityNotFoundException;
-import ru.practicum.shareit.common.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
@@ -18,7 +17,6 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -225,17 +223,6 @@ class RequestServiceImplTest {
 
         assertThat(all.size(), equalTo(0));
         verify(userRepository, times(0)).findById(any());
-    }
-
-    @Test
-    void getAllUnavailableParamsTest() {
-        RequestService requestService = new RequestServiceImpl(userRepository, itemRepository, requestRepository);
-
-        final ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
-                () -> requestService.getAll(1L, 0, 0));
-
-        assertTrue(exception.getMessage().contains("Некорректные значения параметров from, size"));
     }
 
     @Test

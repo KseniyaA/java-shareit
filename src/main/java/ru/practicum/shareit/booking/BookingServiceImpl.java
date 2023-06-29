@@ -20,7 +20,6 @@ import ru.practicum.shareit.item.model.QItem;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -96,18 +95,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getAllBookingsByUser(long userId, String state, Integer from, Integer size) {
-        if (from != null && size != null && !(from >= 0 && size >= 1)) {
-            throw new BookingIncorrectDataException("Некорректные значения для параметров from, size");
-        }
         BooleanExpression byBookerId = QBooking.booking.booker.id.eq(userId);
         return getBookingsByParams(state, byBookerId, from, size);
     }
 
     @Override
     public List<Booking> getAllBookingsByItemOwner(long itemOwnerId, String state, Integer from, Integer size) {
-        if (from != null && size != null && !(from >= 0 && size >= 1)) {
-            throw new BookingIncorrectDataException("Некорректные значения для параметров from, size");
-        }
         BooleanExpression byItemOwnerId = QItem.item.owner.id.eq(itemOwnerId);
         return getBookingsByParams(state, byItemOwnerId, from, size);
     }
@@ -117,7 +110,6 @@ public class BookingServiceImpl implements BookingService {
         if (filterState == null) {
             throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
-        List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         Sort sortByStartDateDesc = Sort.by(START_FIELD).descending();
         Sort sortByStartDateAsc = Sort.by(START_FIELD).ascending();
@@ -163,16 +155,8 @@ public class BookingServiceImpl implements BookingService {
         }
         if (byPage) {
             Pageable page = PageRequest.of(from / size, size, sort);
-            do {
-                Page<Booking> bookingsPage = bookingRepository.findAll(predicate, page);
-                bookings.addAll(bookingsPage.getContent());
-                if (bookingsPage.hasNext()) {
-                    page = PageRequest.of(bookingsPage.getNumber() + 1, bookingsPage.getSize(), bookingsPage.getSort());
-                } else {
-                    page = null;
-                }
-            } while (page != null);
-            return bookings;
+            Page<Booking> bookingsPage = bookingRepository.findAll(predicate, page);
+            return bookingsPage.getContent();
         } else {
             return (List<Booking>) bookingRepository.findAll(predicate, sort);
         }
