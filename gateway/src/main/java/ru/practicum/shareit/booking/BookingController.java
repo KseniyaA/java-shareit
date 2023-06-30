@@ -7,10 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
+import ru.practicum.shareit.common.ValidateFromIfPresent;
+import ru.practicum.shareit.common.ValidateSizeIfPresent;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -54,8 +54,8 @@ public class BookingController {
 	@GetMapping
 	public ResponseEntity<Object> getAllBookingsByUser(@RequestHeader("X-Sharer-User-Id") long userId,
 													   @RequestParam(defaultValue = "ALL") String state,
-													   @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-													   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size
+													   @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+													   @RequestParam(required = false) @ValidateSizeIfPresent Integer size
 	) {
 		return bookingClient.getAllBookingsByUser(userId, state, from, size);
 	}
@@ -67,8 +67,8 @@ public class BookingController {
 	@GetMapping("/owner")
 	public ResponseEntity<Object> getAllBookingsByItemOwner(@RequestHeader("X-Sharer-User-Id") long itemOwnerId,
 															@RequestParam(defaultValue = "ALL") String state,
-															@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-															@Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+															@RequestParam(required = false) @ValidateFromIfPresent Integer from,
+															@RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
 		return bookingClient.getAllBookingsByItemOwner(itemOwnerId, state, from, size);
 	}
 

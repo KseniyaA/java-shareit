@@ -10,6 +10,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.client.BaseClient;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -60,20 +61,20 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllBookingsByUser(long userId, String state, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of(
-                "state", state,
-                "from", from,
-                "size", size
-        );
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("state", state);
+        parameters.put("from", from);
+        parameters.put("size", size);
+
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
     public ResponseEntity<Object> getAllBookingsByItemOwner(long itemOwnerId, String state, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of(
-                "state", state,
-                "from", from,
-                "size", size
-        );
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("state", state);
+        parameters.put("from", from);
+        parameters.put("size", size);
+
         return get("/owner?state={state}&from={from}&size={size}", itemOwnerId, parameters);
     }
 }

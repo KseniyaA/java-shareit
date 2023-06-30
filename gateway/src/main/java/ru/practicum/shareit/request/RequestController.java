@@ -6,10 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.common.Marker;
+import ru.practicum.shareit.common.ValidateFromIfPresent;
+import ru.practicum.shareit.common.ValidateSizeIfPresent;
 import ru.practicum.shareit.request.dto.RequestDtoRequest;
-
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,8 +37,8 @@ public class RequestController {
      */
     @GetMapping("/all")
     public ResponseEntity<Object> getRequests(@RequestHeader("X-Sharer-User-Id") long userId,
-                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                              @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+                                              @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
         return requestClient.getAll(userId, from, size);
     }
 
