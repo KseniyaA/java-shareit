@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   gateway:
-    build: .
+    build: ./gateway
     image: gateway_image
     container_name: gateway-container
     ports:
@@ -13,7 +13,7 @@ services:
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
-    build: .
+    build: ./server
     image: server_image
     container_name: server-container
     ports:
