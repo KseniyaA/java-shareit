@@ -24,11 +24,11 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> searchByText(String text, Pageable page);
 
     @Query(value = " select i from Item i join i.owner as u " +
-            "where u.id = ?1")
+            "where u.id = ?1 order by i.id asc")
     Page<Item> findAllByOwnerId(long ownerId, Pageable page);
 
     @Query(" select i from Item i join i.owner as u " +
-            "where u.id = ?1")
+            "where u.id = ?1 order by i.id asc")
     List<Item> findAllByOwnerId(long ownerId);
 
     List<Item> findByRequestIn(List<Request> requests);
