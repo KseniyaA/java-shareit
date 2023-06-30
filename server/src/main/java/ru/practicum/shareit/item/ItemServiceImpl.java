@@ -102,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
         if (byPage) {
             Pageable page = PageRequest.of(from / size, size, Sort.by("id").ascending());
             Page<Item> itemsPage = itemRepository.findAllByOwnerId(user.getId(), page);
-            return itemsPage.getContent();
+            items = itemsPage.getContent();
         } else {
             items = itemRepository.findAllByOwnerId(user.getId());
         }
