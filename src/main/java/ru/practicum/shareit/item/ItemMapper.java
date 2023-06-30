@@ -6,8 +6,9 @@ import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookingDateResponse;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.request.RequestMapper;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoResponse;
 import ru.practicum.shareit.user.UserMapper;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class ItemMapper {
                 .name(itemDtoCreateRequest.getName())
                 .description(itemDtoCreateRequest.getDescription())
                 .available(itemDtoCreateRequest.getAvailable())
+                .request(itemDtoCreateRequest.getRequestId() == null ? null :
+                        Request.builder().id(itemDtoCreateRequest.getRequestId()).build())
                 .build();
     }
 
@@ -35,24 +38,20 @@ public class ItemMapper {
     }
 
     public ItemDtoResponse toItemDtoResponse(Item item) {
-        RequestDto requestDto = null;
-        if (item.getRequest() != null) {
-            requestDto = RequestMapper.toRequestDto(item.getRequest());
-        }
         return ItemDtoResponse.builder()
                 .name(item.getName())
                 .description(item.getDescription())
                 .owner(UserMapper.toUserDtoRequest(item.getOwner()))
                 .id(item.getId())
-                .request(requestDto)
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
                 .available(item.getAvailable())
                 .build();
     }
 
     public ItemDtoWithBookingDateResponse toItemDtoWithBookingDateResponse(Item item) {
-        RequestDto requestDto = null;
+        RequestDtoResponse requestDto = null;
         if (item.getRequest() != null) {
-            requestDto = RequestMapper.toRequestDto(item.getRequest());
+            requestDto = RequestMapper.toRequestDtoResponse(item.getRequest());
         }
 
         return ItemDtoWithBookingDateResponse.builder()

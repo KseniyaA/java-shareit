@@ -1,13 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.request.dto.RequestDto;
+import lombok.Getter;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 
 import java.util.List;
 
-@Data
+@Getter
 @Builder
 public class ItemDtoResponse {
     private long id;
@@ -15,6 +14,6 @@ public class ItemDtoResponse {
     private String description;
     private UserDtoRequest owner;
     private Boolean available;
-    private RequestDto request;
+    private Long requestId;
     private List<CommentDtoResponse> comments;
 }

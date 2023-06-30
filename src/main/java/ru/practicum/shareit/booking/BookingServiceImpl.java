@@ -1,8 +1,12 @@
 package ru.practicum.shareit.booking;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,47 +94,71 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingsByUser(long userId, String state) {
+    public List<Booking> getAllBookingsByUser(long userId, String state, Integer from, Integer size) {
         BooleanExpression byBookerId = QBooking.booking.booker.id.eq(userId);
-        return getBookingsByParams(state, byBookerId);
+        return getBookingsByParams(state, byBookerId, from, size);
     }
 
     @Override
-    public List<Booking> getAllBookingsByItemOwner(long itemOwnerId, String state) {
+    public List<Booking> getAllBookingsByItemOwner(long itemOwnerId, String state, Integer from, Integer size) {
         BooleanExpression byItemOwnerId = QItem.item.owner.id.eq(itemOwnerId);
-        return getBookingsByParams(state, byItemOwnerId);
+        return getBookingsByParams(state, byItemOwnerId, from, size);
     }
 
-    private List<Booking> getBookingsByParams(String state, BooleanExpression byOwnerOrBookerId) {
-        LocalDateTime now = LocalDateTime.now();
-        Sort sortByStartDateDesc = Sort.by(START_FIELD).descending();
-        Sort sortByStartDateAsc = Sort.by(START_FIELD).ascending();
+    private List<Booking> getBookingsByParams(String state, BooleanExpression byOwnerOrBookerId, Integer from, Integer size) {
         BookingFilterState filterState = BookingFilterState.findByValue(state);
         if (filterState == null) {
             throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
+        LocalDateTime now = LocalDateTime.now();
+        Sort sortByStartDateDesc = Sort.by(START_FIELD).descending();
+        Sort sortByStartDateAsc = Sort.by(START_FIELD).ascending();
+        Predicate predicate;
+        Sort sort;
         switch (filterState) {
             case ALL:
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId, sortByStartDateDesc);
+                predicate = byOwnerOrBookerId;
+                sort = sortByStartDateDesc;
+                break;
             case CURRENT:
                 BooleanExpression byEndBefore = QBooking.booking.end.after(now);
                 BooleanExpression byStartAfter = QBooking.booking.start.before(now);
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndBefore).and(byStartAfter),
-                        sortByStartDateAsc);
+                predicate = byOwnerOrBookerId.and(byEndBefore).and(byStartAfter);
+                sort = sortByStartDateAsc;
+                break;
             case PAST:
                 BooleanExpression byEndAfter = QBooking.booking.end.before(now);
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byEndAfter), sortByStartDateDesc);
+                predicate = byOwnerOrBookerId.and(byEndAfter);
+                sort = sortByStartDateDesc;
+                break;
             case FUTURE:
                 byStartAfter = QBooking.booking.start.after(now);
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(byStartAfter), sortByStartDateDesc);
+                predicate = byOwnerOrBookerId.and(byStartAfter);
+                sort = sortByStartDateDesc;
+                break;
             case WAITING:
                 BooleanExpression eqWaitingStatus = QBooking.booking.status.eq(BookingStatus.WAITING);
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(eqWaitingStatus), sortByStartDateDesc);
+                predicate = byOwnerOrBookerId.and(eqWaitingStatus);
+                sort = sortByStartDateDesc;
+                break;
             case REJECTED:
                 BooleanExpression eqRejectedStatus = QBooking.booking.status.eq(BookingStatus.REJECTED);
-                return (List<Booking>) bookingRepository.findAll(byOwnerOrBookerId.and(eqRejectedStatus), sortByStartDateDesc);
+                predicate = byOwnerOrBookerId.and(eqRejectedStatus);
+                sort = sortByStartDateDesc;
+                break;
             default:
                 throw new UnsupportedStatusException("Unknown state");
+        }
+        boolean byPage = false;
+        if (from != null && size != null) {
+            byPage = true;
+        }
+        if (byPage) {
+            Pageable page = PageRequest.of(from / size, size, sort);
+            Page<Booking> bookingsPage = bookingRepository.findAll(predicate, page);
+            return bookingsPage.getContent();
+        } else {
+            return (List<Booking>) bookingRepository.findAll(predicate, sort);
         }
     }
 }

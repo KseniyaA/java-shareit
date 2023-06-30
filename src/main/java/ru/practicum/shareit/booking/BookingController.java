@@ -2,9 +2,12 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.common.ValidateFromIfPresent;
+import ru.practicum.shareit.common.ValidateSizeIfPresent;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
@@ -15,6 +18,7 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class BookingController {
     private final BookingService bookingService;
     private final UserService userService;
@@ -54,9 +58,12 @@ public class BookingController {
      */
     @GetMapping
     public List<BookingDtoResponse> getAllBookingsByUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                 @RequestParam(defaultValue = "ALL") String state) {
+                                                         @RequestParam(defaultValue = "ALL") String state,
+                                                         @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+                                                         @RequestParam(required = false) @ValidateSizeIfPresent Integer size
+                                                         ) {
         userService.getById(userId);
-        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByUser(userId, state));
+        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByUser(userId, state, from, size));
     }
 
     /**
@@ -65,9 +72,12 @@ public class BookingController {
      */
     @GetMapping("/owner")
     public List<BookingDtoResponse> getAllBookingsByItemOwner(@RequestHeader("X-Sharer-User-Id") long itemOwnerId,
-                                                 @RequestParam(defaultValue = "ALL") String state) {
+                                                              @RequestParam(defaultValue = "ALL") String state,
+                                                              @RequestParam(required = false) @ValidateFromIfPresent Integer from,
+                                                              @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
         userService.getById(itemOwnerId);
-        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByItemOwner(itemOwnerId, state));
+        return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByItemOwner(itemOwnerId, state,
+                from, size));
     }
 
 }

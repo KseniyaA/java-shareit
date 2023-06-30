@@ -10,9 +10,7 @@ import ru.practicum.shareit.booking.exception.BookingIncorrectDataException;
 import ru.practicum.shareit.booking.exception.BookingUnavailableOperationException;
 import ru.practicum.shareit.booking.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.exceptions.ItemIncorrectOwnerException;
-import ru.practicum.shareit.user.exception.UserAlreadyExistException;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,15 +22,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final EntityNotFoundException e) {
         log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
-        return new ErrorResponse(
-                "Ошибка получения по id", e.getMessage()
-        );
-    }
-
-    @ExceptionHandler(value = {UserAlreadyExistException.class})
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleUserException(final UserAlreadyExistException e) {
-        log.debug("Получен статус 409 Conflict {}", e.getMessage(), e);
         return new ErrorResponse(
                 "Ошибка получения по id", e.getMessage()
         );
@@ -98,23 +87,6 @@ public class ErrorHandler {
                     .collect(Collectors.toList());
             return new ValidationErrorResponse(violations);
         }
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationErrorResponse onConstraintValidationException(
-            ConstraintViolationException e
-    ) {
-        log.debug("Получен статус 400 Bad Request {}", e.getMessage(), e);
-        final List<Violation> violations = e.getConstraintViolations().stream()
-                .map(
-                        violation -> new Violation(
-                                violation.getPropertyPath().toString(),
-                                violation.getMessage()
-                        )
-                )
-                .collect(Collectors.toList());
-        return new ValidationErrorResponse(violations);
     }
 
     @ExceptionHandler(Throwable.class)
