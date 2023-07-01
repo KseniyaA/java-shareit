@@ -12,13 +12,14 @@ import ru.practicum.shareit.common.ValidateSizeIfPresent;
 
 import javax.validation.Valid;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 @Controller
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
 public class BookingController {
-	private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
 	private static final String BOOKING_ID = "bookingId";
 	private final BookingClient bookingClient;
 
@@ -37,7 +38,7 @@ public class BookingController {
 	public ResponseEntity<Object> approve(@RequestHeader(X_SHARER_USER_ID) long userId,
 										  @PathVariable(BOOKING_ID) long bookingId,
 										  @RequestParam Boolean approved) {
-		log.info("Получен запрос PATCH /bookings/bookingId с параметрами userId = {}, bookingId = {}, approved = {}",
+		log.info("Получен запрос PATCH /bookings/bookingId?approved={approved} с параметрами userId = {}, bookingId = {}, approved = {}",
 				userId, bookingId, approved);
 		return bookingClient.approve(bookingId, approved, userId);
 	}
@@ -49,7 +50,7 @@ public class BookingController {
 	@GetMapping("/{bookingId}")
 	public ResponseEntity<Object> get(@RequestHeader(X_SHARER_USER_ID) long userId,
 									  @PathVariable(BOOKING_ID) long bookingId) {
-		log.info("Получен запрос GET /bookings/bookingId с параметрами userId = {}, bookingId = {}", userId, bookingId);
+		log.info("Получен запрос GET /bookings/{bookingId} с параметрами userId = {}, bookingId = {}", userId, bookingId);
 		return bookingClient.getById(bookingId, userId);
 	}
 
@@ -62,8 +63,8 @@ public class BookingController {
 													   @RequestParam(defaultValue = "ALL") String state,
 													   @RequestParam(required = false) @ValidateFromIfPresent Integer from,
 													   @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
-		log.info("Получен запрос GET /bookings с параметрами userId = {}, state = {}, from = {}, size = {}",
-				userId, state, from, size);
+		log.info("Получен запрос GET /bookings?state={state}&from={from}&size={size} с параметрами " +
+				"userId = {}, state = {}, from = {}, size = {}", userId, state, from, size);
 		return bookingClient.getAllBookingsByUser(userId, state, from, size);
 	}
 
@@ -76,8 +77,8 @@ public class BookingController {
 															@RequestParam(defaultValue = "ALL") String state,
 															@RequestParam(required = false) @ValidateFromIfPresent Integer from,
 															@RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
-		log.info("Получен запрос GET /bookings/owner с параметрами userId = {}, state = {}, from = {}, size = {}",
-				itemOwnerId, state, from, size);
+		log.info("Получен запрос GET /bookings/owner?state={state}&from={from}&size={size} с параметрами " +
+				"userId = {}, state = {}, from = {}, size = {}", itemOwnerId, state, from, size);
 		return bookingClient.getAllBookingsByItemOwner(itemOwnerId, state, from, size);
 	}
 

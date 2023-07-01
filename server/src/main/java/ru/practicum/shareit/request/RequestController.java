@@ -9,13 +9,14 @@ import ru.practicum.shareit.request.dto.RequestDtoResponse;
 
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @Validated
 @RequestMapping(path = "/requests")
 public class RequestController {
-    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final RequestService requestService;
 
     @PostMapping
@@ -43,7 +44,7 @@ public class RequestController {
     public List<RequestDtoResponse> getRequests(@RequestHeader(X_SHARER_USER_ID) long userId,
                                                 @RequestParam(required = false) Integer from,
                                                 @RequestParam(required = false) Integer size) {
-        log.info("Получен запрос GET /requests/all с параметрами userId = {}, from = {}, size = {}", userId, from, size);
+        log.info("Получен запрос GET /requests/all?from={from}&size={size} с параметрами userId = {}, from = {}, size = {}", userId, from, size);
         List<Request> requests = requestService.getAll(userId, from, size);
         return RequestMapper.toRequestDtoResponseList(requests);
     }
@@ -51,7 +52,7 @@ public class RequestController {
     @GetMapping("/{requestId}")
     public RequestDtoResponse getRequestsById(@RequestHeader(X_SHARER_USER_ID) long userId,
                                               @PathVariable("requestId") long id) {
-        log.info("Получен запрос GET /requests/requestId с параметрами userId = {}, requestId = {}", userId, id);
+        log.info("Получен запрос GET /requests/{requestId} с параметрами userId = {}, requestId = {}", userId, id);
         return RequestMapper.toRequestDtoResponse(requestService.getById(id, userId));
     }
 }

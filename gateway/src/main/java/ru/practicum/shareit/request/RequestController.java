@@ -10,13 +10,14 @@ import ru.practicum.shareit.common.ValidateFromIfPresent;
 import ru.practicum.shareit.common.ValidateSizeIfPresent;
 import ru.practicum.shareit.request.dto.RequestDtoRequest;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @Validated
 @RequestMapping(path = "/requests")
 public class RequestController {
-    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final RequestClient requestClient;
 
     @PostMapping
@@ -42,14 +43,14 @@ public class RequestController {
     public ResponseEntity<Object> getRequests(@RequestHeader(X_SHARER_USER_ID) long userId,
                                               @RequestParam(required = false) @ValidateFromIfPresent Integer from,
                                               @RequestParam(required = false) @ValidateSizeIfPresent Integer size) {
-        log.info("Получен запрос GET /requests/all с параметрами userId = {}, from = {}, size = {}", userId, from, size);
+        log.info("Получен запрос GET /requests/all?from={from}&size={size} с параметрами userId = {}, from = {}, size = {}", userId, from, size);
         return requestClient.getAll(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getRequestsById(@RequestHeader(X_SHARER_USER_ID) long userId,
                                                   @PathVariable("requestId") long id) {
-        log.info("Получен запрос GET /requests/requestId с параметрами userId = {}, requestId = {}", userId, id);
+        log.info("Получен запрос GET /requests/{requestId} с параметрами userId = {}, requestId = {}", userId, id);
         return requestClient.getById(id, userId);
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
+    private static final String USER_ID = "userId";
     private final UserService userService;
 
     @PostMapping
@@ -25,15 +26,15 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDtoResponse update(@RequestBody UserDtoRequest userDtoRequest,
-                                  @PathVariable("userId") long userId) {
-        log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoRequest, userId);
+                                  @PathVariable(USER_ID) long userId) {
+        log.info("Получен запрос PATCH /users/{userId} с параметрами dto = {} и userId = {}", userDtoRequest, userId);
         User user = userService.update(UserMapper.toUser(userDtoRequest, userId));
         return UserMapper.toUserDtoResponse(user);
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable("userId") long userId) {
-        log.info("Получен запрос DELETE /users с id = {}", userId);
+    public void delete(@PathVariable(USER_ID) long userId) {
+        log.info("Получен запрос DELETE /users/{userId} с userId = {}", userId);
         userService.deleteById(userId);
     }
 

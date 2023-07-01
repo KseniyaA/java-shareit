@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.dto.UserDtoRequest;
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
+    private static final String USER_ID = "userId";
     private final UserClient userClient;
 
     @PostMapping
@@ -23,14 +24,14 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<Object> update(@RequestBody @Validated({Marker.OnUpdate.class}) UserDtoRequest userDtoRequest,
-                                         @PathVariable("userId") long userId) {
-        log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoRequest, userId);
+                                         @PathVariable(USER_ID) long userId) {
+        log.info("Получен запрос PATCH /users/{userId} с параметрами dto = {} и userId = {}", userDtoRequest, userId);
         return userClient.update(userDtoRequest, userId);
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable("userId") long userId) {
-        log.info("Получен запрос DELETE /users с id = {}", userId);
+    public void delete(@PathVariable(USER_ID) long userId) {
+        log.info("Получен запрос DELETE /users/{userId} с userId = {}", userId);
         userClient.deleteById(userId);
     }
 

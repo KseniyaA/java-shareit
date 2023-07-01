@@ -11,14 +11,16 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
 @RequiredArgsConstructor
 @Validated
 public class BookingController {
-    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private static final String BOOKING_ID = "bookingId";
+    private static final String ALL = "ALL";
     private final BookingService bookingService;
     private final UserService userService;
 
@@ -39,7 +41,7 @@ public class BookingController {
     public BookingDtoResponse approve(@RequestHeader(X_SHARER_USER_ID) long userId,
                                       @PathVariable(BOOKING_ID) long bookingId,
                                       @RequestParam String approved) {
-        log.info("Получен запрос PATCH /bookings/bookingId с параметрами userId = {}, bookingId = {}, approved = {}",
+        log.info("Получен запрос PATCH /bookings/{bookingId}?approved={approved} с параметрами userId = {}, bookingId = {}, approved = {}",
                 userId, bookingId, approved);
         return BookingMapper.toBookingDtoResponse(bookingService.approve(bookingId, Boolean.valueOf(approved), userId));
     }
@@ -51,7 +53,7 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public BookingDtoResponse get(@RequestHeader(X_SHARER_USER_ID) long userId,
                                   @PathVariable(BOOKING_ID) long bookingId) {
-        log.info("Получен запрос GET /bookings/bookingId с параметрами userId = {}, bookingId = {}", userId, bookingId);
+        log.info("Получен запрос GET /bookings/{bookingId} с параметрами userId = {}, bookingId = {}", userId, bookingId);
         return BookingMapper.toBookingDtoResponse(bookingService.get(bookingId, userId));
     }
 
@@ -61,11 +63,11 @@ public class BookingController {
      */
     @GetMapping
     public List<BookingDtoResponse> getAllBookingsByUser(@RequestHeader(X_SHARER_USER_ID) long userId,
-                                                         @RequestParam(defaultValue = "ALL") String state,
+                                                         @RequestParam(defaultValue = ALL) String state,
                                                          @RequestParam(required = false) Integer from,
                                                          @RequestParam(required = false) Integer size) {
-        log.info("Получен запрос GET /bookings с параметрами userId = {}, state = {}, from = {}, size = {}",
-                userId, state, from, size);
+        log.info("Получен запрос GET /bookings?state={state}&from={from}&size={size} с параметрами " +
+                "userId = {}, state = {}, from = {}, size = {}", userId, state, from, size);
         userService.getById(userId);
         return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByUser(userId, state, from, size));
     }
@@ -76,11 +78,11 @@ public class BookingController {
      */
     @GetMapping("/owner")
     public List<BookingDtoResponse> getAllBookingsByItemOwner(@RequestHeader(X_SHARER_USER_ID) long itemOwnerId,
-                                                              @RequestParam(defaultValue = "ALL") String state,
+                                                              @RequestParam(defaultValue = ALL) String state,
                                                               @RequestParam(required = false) Integer from,
                                                               @RequestParam(required = false) Integer size) {
-        log.info("Получен запрос GET /bookings/owner с параметрами userId = {}, state = {}, from = {}, size = {}",
-                itemOwnerId, state, from, size);
+        log.info("Получен запрос GET /bookings/owner?state={state}&from={from}&size={size} с параметрами " +
+                "userId = {}, state = {}, from = {}, size = {}", itemOwnerId, state, from, size);
         userService.getById(itemOwnerId);
         return BookingMapper.toBookingDtoResponseList(bookingService.getAllBookingsByItemOwner(itemOwnerId, state,
                 from, size));
