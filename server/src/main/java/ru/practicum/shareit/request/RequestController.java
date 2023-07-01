@@ -15,11 +15,13 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/requests")
 public class RequestController {
+    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final RequestService requestService;
 
     @PostMapping
-    public RequestDtoResponse add(@RequestHeader("X-Sharer-User-Id") long requesterId,
+    public RequestDtoResponse add(@RequestHeader(X_SHARER_USER_ID) long requesterId,
                                   @RequestBody RequestDtoRequest requestDtoRequest) {
+        log.info("Получен запрос POST /requests с параметрами userId = {}, dto = {}", requesterId, requestDtoRequest);
         Request request = requestService.add(RequestMapper.toRequest(requestDtoRequest), requesterId);
         return RequestMapper.toRequestDtoResponse(request);
     }
@@ -28,7 +30,8 @@ public class RequestController {
      * GET /requests — получить список своих запросов вместе с данными об ответах на них
      */
     @GetMapping
-    public List<RequestDtoResponse> getRequestsByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<RequestDtoResponse> getRequestsByUser(@RequestHeader(X_SHARER_USER_ID) long userId) {
+        log.info("Получен запрос GET /requests с параметрами userId = {}", userId);
         List<Request> requests = requestService.getAllByUser(userId);
         return RequestMapper.toRequestDtoResponseList(requests);
     }
@@ -37,16 +40,18 @@ public class RequestController {
      * GET /requests/all?from={from}&size={size} — получить список запросов, созданных другими пользователями
      */
     @GetMapping("/all")
-    public List<RequestDtoResponse> getRequests(@RequestHeader("X-Sharer-User-Id") long userId,
-                                          @RequestParam(required = false) Integer from,
-                                          @RequestParam(required = false) Integer size) {
+    public List<RequestDtoResponse> getRequests(@RequestHeader(X_SHARER_USER_ID) long userId,
+                                                @RequestParam(required = false) Integer from,
+                                                @RequestParam(required = false) Integer size) {
+        log.info("Получен запрос GET /requests/all с параметрами userId = {}, from = {}, size = {}", userId, from, size);
         List<Request> requests = requestService.getAll(userId, from, size);
         return RequestMapper.toRequestDtoResponseList(requests);
     }
 
     @GetMapping("/{requestId}")
-    public RequestDtoResponse getRequestsById(@RequestHeader("X-Sharer-User-Id") long userId,
+    public RequestDtoResponse getRequestsById(@RequestHeader(X_SHARER_USER_ID) long userId,
                                               @PathVariable("requestId") long id) {
+        log.info("Получен запрос GET /requests/requestId с параметрами userId = {}, requestId = {}", userId, id);
         return RequestMapper.toRequestDtoResponse(requestService.getById(id, userId));
     }
 }

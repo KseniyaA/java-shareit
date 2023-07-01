@@ -22,8 +22,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> update(@Validated({Marker.OnUpdate.class}) @RequestBody UserDtoRequest userDtoRequest,
-                                  @PathVariable("userId") long userId) {
+    public ResponseEntity<Object> update(@RequestBody @Validated({Marker.OnUpdate.class}) UserDtoRequest userDtoRequest,
+                                         @PathVariable("userId") long userId) {
         log.info("Получен запрос PATCH /users с параметрами {} и id = {}", userDtoRequest, userId);
         return userClient.update(userDtoRequest, userId);
     }
